@@ -1,0 +1,84 @@
+<div class="visualization-container">
+  <div class="chart-area">
+    <div class="controls-container">
+      <div class="controls">
+        <div class="selector-container">
+          <label for="continent-select">Continent:</label>
+          <select
+            id="continent-select"
+            class="continent-select"
+            [value]="selectedContinent()"
+            (change)="onContinentChange($event)"
+          >
+            @for (continent of availableContinents(); track $index) {
+            <option [value]="continent">
+              {{ continent }}
+            </option>
+            }
+          </select>
+        </div>
+
+        <div class="toggle-container">
+          <span class="toggle-label">Area</span>
+          <label class="switch">
+            <input
+              type="checkbox"
+              [checked]="sizeBy() === 'population'"
+              (change)="
+                onSizeByChange(
+                  sizeBy() === 'population' ? 'land_area_km2' : 'population'
+                )
+              "
+            />
+            <span class="slider round"></span>
+          </label>
+          <span class="toggle-label">Population</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-wrapper">
+      <div #chartContainer class="chart-container"></div>
+    </div>
+  </div>
+
+  <div class="side-drawer" [class.open]="drawerOpen()">
+    @if (selectedCountry()) {
+    <div class="drawer-header">
+      <h2>{{ selectedCountry()?.country }}</h2>
+      <button class="close-button" (click)="closeDrawer()">×</button>
+    </div>
+    <div class="country-details">
+      <img
+        [src]="selectedCountry()?.flag"
+        alt="Flag of {{ selectedCountry()?.country }}"
+        class="country-flag"
+      />
+      <div class="stats">
+        <div class="stat-item">
+          <span class="stat-label">Area:</span>
+          <span class="stat-value"
+            >{{ selectedCountry()?.land_area_km2 | number }} km²</span
+          >
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Population:</span>
+          <span class="stat-value">{{
+            selectedCountry()?.population | number
+          }}</span>
+        </div>
+        <div class="stat-item">
+          <a
+            [href]="selectedCountry()?.wikipedia"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="wiki-link"
+          >
+            Learn More
+          </a>
+        </div>
+      </div>
+    </div>
+    }
+  </div>
+</div>

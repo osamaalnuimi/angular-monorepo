@@ -14,7 +14,17 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@angular-monorepo/visualizations/domain": [
+        "libs/visualizations/domain/src/index.ts"
+      ],
+      "@angular-monorepo/visualizations/feature-world-demographics": [
+        "libs/visualizations/feature-world-demographics/src/index.ts"
+      ],
+      "@angular-monorepo/visualizations/ui-circle-packging": [
+        "libs/visualizations/ui-circle-packging/src/index.ts"
+      ]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }

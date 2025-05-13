@@ -1,10 +1,137 @@
+# World Demographics Visualization
+
+![Angular](https://img.shields.io/badge/Angular-DD0031?style=for-the-badge&logo=angular&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![D3.js](https://img.shields.io/badge/D3.js-F9A03C?style=for-the-badge&logo=d3.js&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+
+An interactive data visualization project built with Angular and D3.js that displays world demographics data using circle packing visualization techniques. The application allows users to explore population and land area statistics by continent, region, and country.
+
+## Features
+
+- **Interactive Circle Packing Visualization**: Explore hierarchical data with an intuitive, interactive interface
+- **Continent Selection**: Filter data by continent to focus on specific geographical areas
+- **Metric Toggle**: Switch between population and land area metrics
+- **Responsive Design**: Optimized for various screen sizes with horizontal layout for wide screens
+- **Loading & Error States**: User-friendly feedback during data loading and error handling
+
+## Project Architecture
+
+This project follows Domain-Driven Design principles within an Angular monorepo structure:
+
+```
+angular-monorepo/
+├── apps/
+│   └── angular-case-study/      # Main application
+├── libs/
+│   └── visualizations/
+│       ├── domain/              # Domain layer (entities, interfaces)
+│       ├── feature-world-demographics/  # Feature components (smart)
+│       └── ui-circle-packging-visualization/  # UI components (dumb)
+├── docs/
+│   ├── adr/                     # Architecture Decision Records
+│   └── tdr/                     # Technical Decision Records
+└── Dockerfile                   # Docker configuration
+```
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js (v18 or later)
+- npm (v9 or later)
+- Docker (optional, for containerized deployment)
+
+### Installation
+
+1. Clone the repository:
+
+   ```sh
+   git clone https://github.com/osamaalnuimi/angular-monorepo.git
+   cd angular-monorepo
+   ```
+
+2. Install dependencies:
+
+   ```sh
+   npm install
+   ```
+
+3. Start the development server:
+
+   ```sh
+   npx nx serve angular-case-study
+   ```
+
+4. Open your browser and navigate to `http://localhost:4200`
+
+### Docker Deployment
+
+To build and run the application using Docker:
+
+1. Build the Docker image:
+
+   ```sh
+   docker build -t world-demographics-viz .
+   ```
+
+2. Run the container:
+
+   ```sh
+   docker run -p 80:80 world-demographics-viz
+   ```
+
+3. Access the application at `http://localhost`
+
+## Development
+
+### Generate a new library
+
+```sh
+npx nx g @nx/angular:lib my-lib --directory=visualizations
+```
+
+### Generate a component
+
+```sh
+npx nx g @nx/angular:component my-component --project=visualizations-ui-circle-packging-visualization
+```
+
+### Running tests
+
+```sh
+# Run tests for all projects
+npx nx run-many --target=test --all
+
+# Run tests for a specific project
+npx nx test visualizations-ui-circle-packging
+```
+
+## Documentation
+
+For more detailed information about the project architecture and technical decisions, see:
+
+- [Architecture Decision Records](./docs/adr/README.md)
+- [Technical Decision Records](./docs/tdr/README.md)
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+---
+
+# Original Nx Workspace Documentation
+
+<details>
+<summary>Click to expand</summary>
+
 # AngularMonorepo
 
 <a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
 
 ✨ Your new, shiny [Nx workspace](https://nx.dev) is ready ✨.
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/tutorials/3-angular-monorepo/1a-introduction/1-welcome?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+[Learn more about this workspace setup and its capabilities](https://nx.dev/tutorials/3-angular-monorepo/1a-introduction/1-welcome?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
 
 ## Run tasks
 
@@ -89,13 +216,15 @@ Nx Console is an editor extension that enriches your developer experience. It le
 
 Learn more:
 
-- [Learn more about this workspace setup](https://nx.dev/tutorials/3-angular-monorepo/1a-introduction/1-welcome?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
+- [Learn more about this workspace setup](https://nx.dev/tutorials/3-angular-monorepo/1a-introduction/1-welcome?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
 - [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
 - [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
 - [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
 
 And join the Nx community:
+
 - [Discord](https://go.nx.dev/community)
 - [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
 - [Our Youtube channel](https://www.youtube.com/@nxdevtools)
 - [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+</details>

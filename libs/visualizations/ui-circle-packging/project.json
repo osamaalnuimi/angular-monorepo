@@ -1,0 +1,20 @@
+{
+  "name": "visualizations-ui-circle-packging",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/visualizations/ui-circle-packging/src",
+  "prefix": "visualizations-ui-circle-packging",
+  "projectType": "library",
+  "tags": ["domain:visualizations", "type:ui"],
+  "targets": {
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "libs/visualizations/ui-circle-packging/jest.config.ts"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}

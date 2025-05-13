@@ -1,0 +1,24 @@
+@let data = dataset(); @if(isLoading()) {
+<div class="loading-container">
+  <div class="spinner"></div>
+  <p>Loading world demographics data...</p>
+</div>
+} @else if(error()) {
+<div class="error-container">
+  <div class="error-icon">⚠️</div>
+  <h3>Error Loading Data</h3>
+  <p>{{ error() }}</p>
+  <button (click)="reload()" class="retry-button">Retry</button>
+</div>
+} @else if(data) {
+<visualizations-circle-packing
+  [dataset]="data"
+  [sizeBy]="sizeBy()"
+  (countrySelected)="onCountrySelected($event)"
+  (sizeByChanged)="onSizeByChanged($event)"
+/>
+} @else {
+<div class="empty-state">
+  <p>No data available</p>
+</div>
+}

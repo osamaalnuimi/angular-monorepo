@@ -1,0 +1,20 @@
+{
+  "name": "visualizations-feature-world-demographics",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/visualizations/feature-world-demographics/src",
+  "prefix": "visualizations-feature-world-demographics",
+  "projectType": "library",
+  "tags": ["domain:visualizations", "type:feature"],
+  "targets": {
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "libs/visualizations/feature-world-demographics/jest.config.ts"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}
