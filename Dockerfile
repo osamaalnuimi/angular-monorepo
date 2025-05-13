@@ -12,20 +12,29 @@ RUN npm ci
 # Copy the rest of the application code
 COPY . .
 
-# Build the application
+# Build the application with SSR
 RUN npm run build
 
-# Stage 2: Serve the application using Nginx
-FROM nginx:alpine
+# Stage 2: Run the server-side rendered application
+FROM node:20-alpine AS runtime
 
-# Copy the build output to replace the default nginx contents
-COPY --from=build /app/dist/apps/angular-case-study /usr/share/nginx/html
+WORKDIR /app
 
-# Copy custom nginx configuration if needed
-# COPY ./nginx.conf /etc/nginx/conf.d/default.conf
+# Copy package files for production dependencies
+COPY package*.json ./
 
-# Expose port 80
-EXPOSE 80
+# Install only production dependencies
+RUN npm ci --omit=dev
 
-# Start Nginx server
-CMD ["nginx", "-g", "daemon off;"]
+# Copy the build output from the build stage
+COPY --from=build /app/dist/apps/angular-case-study /app/dist/apps/angular-case-study
+
+# Set environment variables
+ENV NODE_ENV=production
+ENV PORT=4000
+
+# Expose the port the app runs on
+EXPOSE 4000
+
+# Command to run the application
+CMD ["node", "dist/apps/angular-case-study/server/server.mjs"]

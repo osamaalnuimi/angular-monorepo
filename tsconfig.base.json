@@ -23,6 +23,9 @@
       ],
       "@angular-monorepo/visualizations/ui-circle-packging": [
         "libs/visualizations/ui-circle-packging/src/index.ts"
+      ],
+      "@angular-monorepo/visualizations/util-data-transformation": [
+        "libs/visualizations/util-data-transformation/src/index.ts"
       ]
     }
   },

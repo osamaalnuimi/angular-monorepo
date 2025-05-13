@@ -78,10 +78,10 @@ To build and run the application using Docker:
 2. Run the container:
 
    ```sh
-   docker run -p 80:80 world-demographics-viz
+   docker run -p 4000:4000 world-demographics-viz
    ```
 
-3. Access the application at `http://localhost`
+3. Access the application at `http://localhost:4000`
 
 ## Development
 

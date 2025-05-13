@@ -527,41 +527,71 @@
     ]
   },
   "South America": {
-    "South American Countries": [
+    "Central America": [
+      {
+        "country": "Uruguay",
+        "population": 34800,
+        "wikipedia": "https://en.wikipedia.org/wiki/Uruguay",
+        "flag": "https://flagcdn.com/w320/uy.png",
+        "land_area_km2": 238173
+      },
+      {
+        "country": "Paraguay",
+        "population": 6700000,
+        "wikipedia": "https://en.wikipedia.org/wiki/Paraguay",
+        "flag": "https://flagcdn.com/w320/py.png",
+        "land_area_km2": 406752
+      },
+      {
+        "country": "Bolivia",
+        "population": 11700000,
+        "wikipedia": "https://en.wikipedia.org/wiki/Bolivia",
+        "flag": "https://flagcdn.com/w320/bo.png",
+        "land_area_km2": 1098581
+      },
+      {
+        "country": "Chile",
+        "population": 19200000,
+        "wikipedia": "https://en.wikipedia.org/wiki/Chile",
+        "flag": "https://flagcdn.com/w320/cl.png",
+        "land_area_km2": 464225
+      }
+    ],
+    "South America": [
       {
         "country": "Brazil",
-        "population": 212600000,
+        "population": 213000000,
         "wikipedia": "https://en.wikipedia.org/wiki/Brazil",
         "flag": "https://flagcdn.com/w320/br.png",
         "land_area_km2": 8515767
       },
       {
-        "country": "Argentina",
-        "population": 45200000,
-        "wikipedia": "https://en.wikipedia.org/wiki/Argentina",
-        "flag": "https://flagcdn.com/w320/ar.png",
-        "land_area_km2": 2780400
-      },
-      {
-        "country": "Colombia",
-        "population": 50900000,
-        "wikipedia": "https://en.wikipedia.org/wiki/Colombia",
-        "flag": "https://flagcdn.com/w320/co.png",
-        "land_area_km2": 1141748
-      },
-      {
         "country": "Peru",
-        "population": 32900000,
+        "population": 32800000,
         "wikipedia": "https://en.wikipedia.org/wiki/Peru",
         "flag": "https://flagcdn.com/w320/pe.png",
         "land_area_km2": 1285216
       },
       {
-        "country": "Chile",
-        "population": 19100000,
-        "wikipedia": "https://en.wikipedia.org/wiki/Chile",
-        "flag": "https://flagcdn.com/w320/cl.png",
-        "land_area_km2": 756102
+        "country": "Colombia",
+        "population": 50800000,
+        "wikipedia": "https://en.wikipedia.org/wiki/Colombia",
+        "flag": "https://flagcdn.com/w320/co.png",
+        "land_area_km2": 1141748
+      },
+      {
+        "country": "Argentina",
+        "population": 45300000,
+        "wikipedia": "https://en.wikipedia.org/wiki/Argentina",
+        "flag": "https://flagcdn.com/w320/ar.png",
+        "land_area_km2": 2780400
+      },
+      {
+        "country": "Venezuela",
+        "population": 29000000,
+        "wikipedia": "https://en.wikipedia.org/wiki/Venezuela",
+        "flag": "https://flagcdn.com/w320/ve.png",
+        "land_area_km2": 916452
       }
     ]
   },

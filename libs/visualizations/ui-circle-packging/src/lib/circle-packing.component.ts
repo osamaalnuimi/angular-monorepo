@@ -1,3 +1,18 @@
+import {
+  CircleNode,
+  CountryData,
+  Metric,
+  WorldData,
+} from '@angular-monorepo/visualizations/domain';
+import {
+  calculateHeightForContinent,
+  calculateNodeFillColor,
+  calculateNodeRadius,
+  calculateNodeText,
+  createColorScale,
+  getAllRegions,
+  transformDataToHierarchy,
+} from '@angular-monorepo/visualizations/util-data-transformation';
 import { DecimalPipe } from '@angular/common';
 import {
   AfterViewInit,
@@ -11,23 +26,30 @@ import {
   viewChild,
 } from '@angular/core';
 import * as d3 from 'd3';
-import {
-  WorldData,
-  CountryData,
-  Metric,
-  HierarchicalNode,
-  CircleNode,
-} from '@angular-monorepo/visualizations/domain';
+import { CirclePackingService } from './circle-packing.service';
+
+// Node depth constants for better readability
+const NodeDepth = {
+  ROOT: 0,
+  CONTINENT: 1,
+  REGION: 2,
+  COUNTRY: 3,
+} as const;
+
+// Tooltip offset constant
+const TOOLTIP_OFFSET = 0;
+
 @Component({
   selector: 'visualizations-circle-packing',
   imports: [DecimalPipe],
   templateUrl: './circle-packing.component.html',
   styleUrl: './circle-packing.component.css',
+  providers: [CirclePackingService],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CirclePackingComponent implements AfterViewInit {
-  readonly dataset = input.required<WorldData>();
-  readonly sizeBy = input<Metric>('population');
+  dataset = input.required<WorldData>();
+  sizeBy = input<Metric>('population');
 
   countrySelected = output<CountryData>();
   sizeByChanged = output<Metric>();
@@ -57,7 +79,7 @@ export class CirclePackingComponent implements AfterViewInit {
   private chartInitialized = false;
 
   // Create an effect to update the chart when inputs change
-  constructor() {
+  constructor(private circlePackingService: CirclePackingService) {
     effect(() => {
       // Access the signals to register dependencies
       const datasetValue = this.dataset();
@@ -214,121 +236,65 @@ export class CirclePackingComponent implements AfterViewInit {
     // Clear any existing SVG elements first
     d3.select(containerElement).selectAll('svg').remove();
 
-    // Create SVG element
+    // Create SVG element - IMPORTANT: Don't append 'g' here
     this.svg = d3
       .select(containerElement)
       .append('svg')
       .attr('width', this.width)
       .attr('height', this.height)
-      .append('g')
-      .attr(
-        'transform',
-        `translate(${this.margin.left + this.innerWidth / 2},${
-          this.margin.top + this.innerHeight / 2
-        })`
-      );
+      .style('display', 'block')
+      .style('margin', '0 auto');
   }
 
   // Set height based on the selected continent
   private setHeightBasedOnContinent(): void {
-    const selectedContinentValue = this.selectedContinent();
-    const dataset = this.dataset();
-
-    if (!dataset) {
-      this.height = 600; // Default height
-      return;
-    }
-
-    // Count total countries in the selected continent
-    let countryCount = 0;
-    if (dataset[selectedContinentValue]) {
-      // Count countries in the selected continent
-      Object.values(dataset[selectedContinentValue]).forEach((countries) => {
-        countryCount += countries.length;
-      });
-    }
-
-    // Count regions in the selected continent
-    let regionCount = 0;
-    if (dataset[selectedContinentValue]) {
-      regionCount = Object.keys(dataset[selectedContinentValue]).length;
-    }
-
-    // Use a wider aspect ratio (more width, less height)
-    // Set height based on country count but consider region count for width
-    if (countryCount < 10) {
-      this.height = 500; // Small dataset
-    } else if (countryCount < 30) {
-      this.height = 600; // Medium dataset
-    } else if (countryCount < 50) {
-      this.height = 650; // Large dataset
-    } else {
-      this.height = 700; // Very large dataset
-    }
+    this.height = calculateHeightForContinent(
+      this.selectedContinent(),
+      this.dataset(),
+      this.width
+    );
 
     console.log(
-      `Set height to ${this.height}px for ${countryCount} countries and ${regionCount} regions`
+      `Set height to ${this.height}px for continent ${this.selectedContinent()}`
     );
   }
 
   private updateChart(): void {
-    if (!this.svg) {
-      console.error('SVG not initialized');
+    if (!this.svg || !this.dataset()) {
       return;
     }
-
-    if (!this.dataset()) {
-      console.error('Dataset is empty or undefined');
-      return;
-    }
-
-    console.log('Dataset available:', Object.keys(this.dataset()));
-
-    // Update height based on selected continent
-    this.setHeightBasedOnContinent();
-
-    // Get the container width again to ensure we have the latest size
-    const containerElement = this.chartContainer().nativeElement;
-    const containerWidth = containerElement.clientWidth;
-    this.width = containerWidth || 900;
-
-    // Update SVG dimensions
-    d3.select(containerElement)
-      .select('svg')
-      .attr('width', this.width)
-      .attr('height', this.height);
-
-    // Recalculate inner dimensions
-    this.innerWidth = this.width - this.margin.left - this.margin.right;
-    this.innerHeight = this.height - this.margin.top - this.margin.bottom;
 
     // Clear previous chart content but keep the SVG element
     this.svg.selectAll('*').remove();
 
+    // Set dimensions based on container size and continent
+    this.setHeightBasedOnContinent();
+
+    // Update SVG dimensions
+    this.svg.attr('width', this.width).attr('height', this.height);
+
+    // Set inner dimensions (accounting for margins)
+    this.innerWidth = this.width - this.margin.left - this.margin.right;
+    this.innerHeight = this.height - this.margin.top - this.margin.bottom;
+
     // Transform data into hierarchical structure
-    const hierarchicalData = this.transformData();
-    console.log(
-      'Hierarchical data children count:',
-      hierarchicalData.children?.length || 0
+    const hierarchicalData = transformDataToHierarchy(
+      this.dataset(),
+      this.selectedContinent(),
+      this.sizeBy()
     );
 
-    // Create a circle packing layout with a wider aspect ratio
-    const packLayout = d3
-      .pack<HierarchicalNode>()
-      .size([this.innerWidth, this.innerHeight])
-      .padding(20);
+    // Create hierarchy and pack layout using the service
+    const root = this.circlePackingService.createHierarchy(hierarchicalData);
 
-    // Generate the pack data
-    const root = d3
-      .hierarchy<HierarchicalNode>(hierarchicalData)
-      .sum((d) => d.value || 0);
-
-    // Apply the pack layout
-    const packedData = packLayout(root) as CircleNode;
-    console.log(
-      'Packed data descendants count:',
-      packedData.descendants().length
+    // Create the pack layout with the inner dimensions
+    const packLayout = this.circlePackingService.createPackLayout(
+      this.innerWidth,
+      this.innerHeight
     );
+
+    // Generate the packed data
+    const packedData = packLayout(root);
 
     // Check if we have valid data
     if (isNaN(packedData.r)) {
@@ -338,520 +304,101 @@ export class CirclePackingComponent implements AfterViewInit {
       return;
     }
 
-    // Generate color scale for regions
-    const regions = Object.keys(this.getAllRegions());
-    const colorScale = d3
-      .scaleOrdinal<string>()
-      .domain(regions)
-      .range(d3.schemeCategory10);
+    // Get all regions for color scale
+    const regions = Object.keys(getAllRegions(this.dataset()));
+    const colorScale = createColorScale(regions);
 
-    // Skip drawing continents (depth 1) since we're already filtering by continent
-    // Only draw regions (depth 2) and countries (depth 3)
-
-    // Draw regions (depth 2)
-    this.drawCircleGroup(
-      packedData.descendants().filter((d) => d.depth === 2) as CircleNode[],
-      colorScale
-    );
-
-    // Draw countries (depth 3)
-    this.drawCircleGroup(
-      packedData.descendants().filter((d) => d.depth === 3) as CircleNode[],
-      colorScale
-    );
-
-    console.log('Chart update completed');
-  }
-
-  private drawCircleGroup(
-    nodes: CircleNode[],
-    colorScale: d3.ScaleOrdinal<string, string>
-  ): void {
-    if (!nodes || nodes.length === 0) return;
-
-    // Sort nodes by radius (largest first for rendering, but smallest on top for interaction)
-    nodes.sort((a, b) => b.r - a.r);
-
-    // Create a group for each node
-    const nodeGroups = this.svg
-      ?.selectAll(`g.node-depth-${nodes[0].depth}`)
-      .data(nodes)
-      .enter()
+    // Create a centered container group
+    const container = this.svg
       .append('g')
-      .attr('class', `node node-depth-${nodes[0].depth}`)
       .attr(
         'transform',
-        (d) =>
-          `translate(${d.x - this.innerWidth / 2},${
-            d.y - this.innerHeight / 2
-          })`
+        `translate(${this.width / 2 - this.innerWidth / 2}, ${
+          this.height / 2 - this.innerHeight / 2
+        })`
       );
 
-    // Add circles
-    nodeGroups
-      ?.append('circle')
-      .attr('r', (d) => {
-        // Scale circles based on depth to ensure better visibility
-        if (d.depth === 1) {
-          // Continents - keep original size
-          return d.r;
-        } else if (d.depth === 2) {
-          // Regions - ensure minimum size
-          return Math.max(d.r, 20);
-        } else if (d.depth === 3) {
-          // Countries - ensure minimum size for visibility
-          return Math.max(d.r, 8);
-        }
-        return d.r;
-      })
-      .attr('fill', (d) => {
-        if (d.depth === 0) return 'white'; // Root
-        if (d.depth === 1) return '#ccc'; // Continent
-        if (d.depth === 2) return colorScale(d.data.name); // Region
-        // Convert color object to string with proper null checking
-        const parentColor = d.parent ? colorScale(d.parent.data.name) : '#ccc';
-        const brighterColor = d3.color(parentColor)?.brighter(0.5);
-        return brighterColor ? brighterColor.toString() : parentColor; // Country
-      })
-      .attr('stroke', (d) => (d.depth === 3 ? 'black' : 'none'))
-      .attr('stroke-width', 1)
-      .attr('opacity', (d) => {
-        if (d.depth === 0) return 0;
-        if (d.depth === 3) return 0.9; // Make countries more visible
-        return 0.8;
-      })
-      .style('cursor', (d) => (d.depth === 3 ? 'pointer' : 'default'))
-      .on('click', (event: MouseEvent, d) => {
-        if (d.depth === 3 && d.data.country) {
-          this.openDrawer(d.data.country);
-        }
-      });
+    // Create circles for each node
+    const node = container
+      .selectAll('g')
+      .data(packedData.descendants())
+      .join('g')
+      .attr('transform', (d) => `translate(${d.x},${d.y})`)
+      .style('cursor', (d) =>
+        d.depth === NodeDepth.COUNTRY ? 'pointer' : 'default'
+      ) // Only use pointer for countries
+      .on('click', (event, d) => this.handleNodeClick(d as CircleNode))
+      .on('mouseover', (event, d) =>
+        this.handleMouseOver(event, d as CircleNode)
+      )
+      .on('mouseout', () => this.handleMouseOut());
 
-    // Add text labels for countries
-    if (nodes[0].depth === 3) {
-      nodeGroups
-        ?.append('text')
-        .attr('dy', '.3em')
-        .style('text-anchor', 'middle')
-        .style('font-size', (d) => {
-          // Adjust font size based on circle radius, but ensure minimum readability
-          const calculatedSize = Math.min(d.r / 3, 10);
-          return Math.max(calculatedSize, 8) + 'px';
-        })
-        .style('fill', 'white')
-        .style('pointer-events', 'none') // Prevent text from interfering with clicks
-        .style('text-shadow', '0px 0px 2px rgba(0,0,0,0.7)') // Add text shadow for better visibility
-        .text((d) => {
-          // Always try to show at least some text
-          if (d.r < 10) {
-            // For very small circles, show first letter only
-            return d.data.name.charAt(0);
-          }
+    // Add circle elements
+    node
+      .append('circle')
+      .attr('r', (d) => calculateNodeRadius(d as CircleNode))
+      .attr('fill', (d) => calculateNodeFillColor(d as CircleNode, colorScale))
+      .attr('stroke', '#999')
+      .attr('stroke-width', (d) => (d.depth === NodeDepth.CONTINENT ? 2 : 1))
+      .style('pointer-events', 'all'); // Ensure circles capture events
 
-          // For medium circles, show abbreviated text
-          if (d.r < 20) {
-            const words = d.data.name.split(' ');
-            if (words.length > 1) {
-              return words.map((w) => w[0]).join('');
-            }
-            return d.data.name.substring(0, 3);
-          }
+    // Add text labels - only for countries (depth 3)
+    node
+      .append('text')
+      .attr('dy', '0.3em')
+      .attr('text-anchor', 'middle')
+      .style('font-size', (d) => `${Math.min(d.r / 3, 14)}px`)
+      .style('pointer-events', 'none') // Text shouldn't interfere with events
+      .style('display', (d) =>
+        d.depth === NodeDepth.COUNTRY ? 'block' : 'none'
+      ) // Only show text for countries
+      .text((d) => calculateNodeText(d as CircleNode));
 
-          // For larger circles, show full or truncated name
-          return d.data.name.length > d.r / 3
-            ? d.data.name.substring(0, Math.floor(d.r / 3)) + '...'
-            : d.data.name;
-        });
-    }
-
-    // Add hover effects
-    this.addHoverEffects(
-      nodeGroups as d3.Selection<SVGGElement, CircleNode, SVGGElement, unknown>
-    );
+    console.log('Chart updated with new data');
   }
 
-  private addHoverEffects(
-    nodeGroups: d3.Selection<SVGGElement, CircleNode, SVGGElement, unknown>
-  ): void {
-    const depth = nodeGroups.data()[0]?.depth;
-    if (depth === undefined) return;
-
-    if (depth === 1) {
-      // Continents
-      nodeGroups
-        ?.on('mouseover', (event: MouseEvent, d) => {
-          // Highlight the continent
-          d3.select(event.currentTarget as any)
-            .select('circle')
-            .attr('stroke', 'black')
-            .attr('stroke-width', 2)
-            .attr('opacity', 0.9);
-
-          // Show title with animation
-          const tooltip = this.svg
-            ?.append('g')
-            .attr('class', 'tooltip continent-tooltip')
-            .attr(
-              'transform',
-              `translate(${d.x - this.innerWidth / 2},${
-                d.y - this.innerHeight / 2 - d.r
-              })`
-            );
-
-          // Calculate text width to determine tooltip width
-          const tempText = this.svg
-            ?.append('text')
-            .attr('visibility', 'hidden')
-            .text(d.data.name);
-
-          const textLength = tempText?.node()?.getComputedTextLength() || 0;
-          tempText?.remove();
-
-          // Ensure minimum width of 160px or text width + padding
-          const tooltipWidth = Math.max(160, textLength + 40);
-
-          tooltip
-            ?.append('rect')
-            .attr('x', -tooltipWidth / 2)
-            .attr('y', -25)
-            .attr('width', tooltipWidth)
-            .attr('height', 30)
-            .attr('rx', 5)
-            .attr('fill', 'white')
-            .attr('stroke', 'black')
-            .attr('stroke-width', 1)
-            .attr('opacity', 0)
-            .transition()
-            .duration(200)
-            .attr('opacity', 0.9);
-
-          tooltip
-            ?.append('text')
-            .attr('text-anchor', 'middle')
-            .attr('dy', '-10')
-            .style('font-size', '14px')
-            .style('font-weight', 'bold')
-            .style('opacity', 0)
-            .text(d.data.name)
-            .transition()
-            .duration(200)
-            .style('opacity', 1);
-        })
-        .on('mouseout', (event: MouseEvent) => {
-          d3.select(event.currentTarget as any)
-            .select('circle')
-            .attr('stroke', 'none')
-            .attr('stroke-width', 1)
-            .attr('opacity', 0.8);
-
-          // Remove tooltip with animation
-          this.svg
-            ?.selectAll('.continent-tooltip')
-            .transition()
-            .duration(200)
-            .style('opacity', 0)
-            .remove();
-        });
-    } else if (depth === 2) {
-      // Regions
-      nodeGroups
-        .on('mouseover', (event: MouseEvent, d) => {
-          // Highlight the region
-          d3.select(event.currentTarget as any)
-            .select('circle')
-            .attr('stroke', 'black')
-            .attr('stroke-width', 2)
-            .attr('opacity', 0.9);
-
-          // Show title with animation
-          const tooltip = this.svg
-            ?.append('g')
-            .attr('class', 'tooltip region-tooltip')
-            .attr(
-              'transform',
-              `translate(${d.x - this.innerWidth / 2},${
-                d.y - this.innerHeight / 2 - d.r - 20
-              })`
-            );
-
-          // Calculate text width to determine tooltip width
-          const tempText = this.svg
-            ?.append('text')
-            .attr('visibility', 'hidden')
-            .text(d.data.name);
-
-          const textLength = tempText?.node()?.getComputedTextLength() || 0;
-          tempText?.remove();
-
-          // Ensure minimum width of 160px or text width + padding
-          const tooltipWidth = Math.max(160, textLength + 40);
-
-          tooltip
-            ?.append('rect')
-            .attr('x', -tooltipWidth / 2)
-            .attr('y', -25)
-            .attr('width', tooltipWidth)
-            .attr('height', 30)
-            .attr('rx', 5)
-            .attr('fill', 'white')
-            .attr('stroke', 'black')
-            .attr('stroke-width', 1)
-            .attr('opacity', 0)
-            .transition()
-            .duration(200)
-            .attr('opacity', 0.9);
-
-          tooltip
-            ?.append('text')
-            .attr('text-anchor', 'middle')
-            .attr('dy', '-10')
-            .style('font-size', '14px')
-            .style('font-weight', 'bold')
-            .style('opacity', 0)
-            .text(d.data.name)
-            .transition()
-            .duration(200)
-            .style('opacity', 1);
-        })
-        .on('mouseout', (event: MouseEvent) => {
-          d3.select(event.currentTarget as any)
-            .select('circle')
-            .attr('stroke', 'none')
-            .attr('stroke-width', 1)
-            .attr('opacity', 0.8);
-
-          // Remove tooltip with animation
-          this.svg
-            ?.selectAll('.region-tooltip')
-            .transition()
-            .duration(200)
-            .style('opacity', 0)
-            .remove();
-        });
-    } else if (depth === 3) {
-      // Countries
-      nodeGroups
-        .on('mouseover', (event: MouseEvent, d) => {
-          // Highlight the country
-          d3.select(event.currentTarget as any)
-            .select('circle')
-            .attr('stroke', 'black')
-            .attr('stroke-width', 2)
-            .attr('opacity', 1);
-
-          // Show tooltip with animation
-          const tooltip = this.svg
-            ?.append('g')
-            .attr('class', 'tooltip country-tooltip')
-            .attr(
-              'transform',
-              `translate(${d.x - this.innerWidth / 2},${
-                d.y - this.innerHeight / 2 - d.r - 20
-              })`
-            );
-
-          // Calculate text width to determine tooltip width
-          const tempText = this.svg
-            ?.append('text')
-            .attr('visibility', 'hidden')
-            .text(d.data.country?.country || d.data.name);
-
-          const textLength = tempText?.node()?.getComputedTextLength() || 0;
-          tempText?.remove();
-
-          // Ensure minimum width of 160px or text width + padding
-          const tooltipWidth = Math.max(160, textLength + 40);
-
-          tooltip
-            ?.append('rect')
-            .attr('x', -tooltipWidth / 2)
-            .attr('y', -25)
-            .attr('width', tooltipWidth)
-            .attr('height', 30)
-            .attr('rx', 5)
-            .attr('fill', 'white')
-            .attr('stroke', 'black')
-            .attr('stroke-width', 1)
-            .attr('opacity', 0)
-            .transition()
-            .duration(200)
-            .attr('opacity', 0.9);
-
-          tooltip
-            ?.append('text')
-            .attr('text-anchor', 'middle')
-            .attr('dy', '-10')
-            .style('font-size', '14px')
-            .style('font-weight', 'bold')
-            .style('opacity', 0)
-            .text(d.data.country?.country || d.data.name)
-            .transition()
-            .duration(200)
-            .style('opacity', 1);
-        })
-        .on('mouseout', (event: MouseEvent) => {
-          d3.select(event.currentTarget as any)
-            .select('circle')
-            .attr('stroke', 'black')
-            .attr('stroke-width', 1)
-            .attr('opacity', 0.9);
-
-          // Remove tooltip with animation
-          this.svg
-            ?.selectAll('.country-tooltip')
-            .transition()
-            .duration(200)
-            .style('opacity', 0)
-            .remove();
-        });
+  // Handle node click events
+  private handleNodeClick(d: CircleNode): void {
+    if (d.depth === NodeDepth.COUNTRY && d.data.country) {
+      this.openDrawer(d.data.country);
     }
   }
 
-  private transformData(): HierarchicalNode {
-    const sizeMetric = this.sizeBy();
-    const selectedContinentValue = this.selectedContinent();
+  // Handle mouse over events
+  private handleMouseOver(event: MouseEvent, d: CircleNode): void {
+    // Only show tooltips for countries
+    if (d.depth !== NodeDepth.COUNTRY || !this.svg) return;
 
-    console.log('Size metric:', sizeMetric);
-    console.log('Selected continent:', selectedContinentValue);
-
-    // Create hierarchical structure optimized for horizontal layout
-    const hierarchicalData: HierarchicalNode = {
-      name: 'World',
-      children: [],
-    };
-
-    // Process only the selected continent
-    if (
-      selectedContinentValue !== 'all' &&
-      this.dataset()[selectedContinentValue]
-    ) {
-      // Create a wrapper node for the continent to help with horizontal layout
-      const continentNode: HierarchicalNode = {
-        name: selectedContinentValue,
-        children: [],
-      };
-
-      // Get all regions for the selected continent
-      const regions = this.dataset()[selectedContinentValue];
-
-      // Create an array to hold region nodes
-      const regionNodes: HierarchicalNode[] = [];
-
-      // Process each region
-      Object.entries(regions).forEach(([region, countries]) => {
-        const regionNode: HierarchicalNode = {
-          name: region,
-          children: [],
-        };
-
-        // Add countries to the region
-        countries.forEach((country) => {
-          // Ensure country has valid data for the selected metric
-          const value =
-            sizeMetric === 'population'
-              ? country.population
-              : country.land_area_km2;
-
-          if (value && value > 0) {
-            regionNode.children = regionNode.children || [];
-            regionNode.children.push({
-              name: country.country,
-              value: value,
-              country: country,
-            });
-          }
-        });
-
-        // Only add region if it has countries
-        if (regionNode.children && regionNode.children.length > 0) {
-          regionNodes.push(regionNode);
-        }
-      });
-
-      // Sort regions by size (total value) to help with packing
-      regionNodes.sort((a, b) => {
-        const aValue =
-          a.children?.reduce((sum, c) => sum + (c.value || 0), 0) || 0;
-        const bValue =
-          b.children?.reduce((sum, c) => sum + (c.value || 0), 0) || 0;
-        return bValue - aValue; // Descending order
-      });
-
-      // Add sorted regions to the continent node
-      continentNode.children = regionNodes;
-
-      // Add the continent node to the root
-      hierarchicalData.children = [continentNode];
-    } else {
-      // If "all" is selected, create a flatter structure
-      // Group regions by continent for better organization
-      const continentNodes: { [key: string]: HierarchicalNode } = {};
-
-      Object.entries(this.dataset()).forEach(([continent, regions]) => {
-        // Create a node for each continent
-        continentNodes[continent] = {
-          name: continent,
-          children: [],
-        };
-
-        // Add regions to their respective continent
-        Object.entries(regions).forEach(([region, countries]) => {
-          const regionNode: HierarchicalNode = {
-            name: region,
-            children: [],
-          };
-
-          // Add countries
-          countries.forEach((country) => {
-            // Ensure country has valid data for the selected metric
-            const value =
-              sizeMetric === 'population'
-                ? country.population
-                : country.land_area_km2;
-
-            if (value && value > 0) {
-              regionNode.children = regionNode.children || [];
-              regionNode.children.push({
-                name: country.country,
-                value: value,
-                country: country,
-              });
-            }
-          });
-
-          // Only add region if it has countries
-          if (regionNode.children && regionNode.children.length > 0) {
-            continentNodes[continent].children?.push(regionNode);
-          }
-        });
-      });
-
-      // Add non-empty continents to the root
-      Object.values(continentNodes).forEach((continentNode) => {
-        if (continentNode.children && continentNode.children.length > 0) {
-          hierarchicalData.children?.push(continentNode);
-        }
-      });
-    }
-
-    console.log(
-      'Hierarchical data structure created with',
-      hierarchicalData.children?.length || 0,
-      'continents'
+    // Add hover effect using the service
+    this.circlePackingService.addHoverEffect(
+      d3.select(event.currentTarget as Element)
     );
 
-    return hierarchicalData;
+    // Get the circle radius to position tooltip
+    const radius = calculateNodeRadius(d as CircleNode);
+
+    // Always position tooltip at a fixed position above the circle center
+    // regardless of where the mouse is within the circle
+    const tooltipY = d.y - radius - TOOLTIP_OFFSET;
+
+    const tooltipText = `${d.data.name}: ${d.value?.toLocaleString() || ''}`;
+
+    // Use the service to add tooltip with the circle's x coordinate (not the mouse x)
+    this.circlePackingService.addTooltip(this.svg, d.x, tooltipY, tooltipText);
   }
 
-  private getAllRegions(): { [region: string]: boolean } {
-    const regions: { [region: string]: boolean } = {};
+  // Handle mouse out events
+  private handleMouseOut(): void {
+    if (this.svg) {
+      // Remove hover effect using the service
+      this.circlePackingService.removeHoverEffect(
+        this.svg,
+        '#999',
+        NodeDepth.CONTINENT
+      );
 
-    Object.values(this.dataset()).forEach((continentData) => {
-      Object.keys(continentData).forEach((region) => {
-        regions[region] = true;
-      });
-    });
-
-    return regions;
+      // Remove tooltips using the service
+      this.circlePackingService.removeTooltips(this.svg);
+    }
   }
 }

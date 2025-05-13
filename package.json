@@ -2,7 +2,10 @@
   "name": "@angular-monorepo/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "build": "nx build angular-case-study",
+    "serve": "nx serve angular-case-study"
+  },
   "private": true,
   "dependencies": {
     "@angular/common": "~19.2.0",

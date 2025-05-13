@@ -1,0 +1,20 @@
+{
+  "name": "visualizations-util-data-transformation",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/visualizations/util-data-transformation/src",
+  "prefix": "visualizations-util-data-transformation",
+  "projectType": "library",
+  "tags": ["domain:visualizations", "type:util"],
+  "targets": {
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "libs/visualizations/util-data-transformation/jest.config.ts"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}
