@@ -1,0 +1,65 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "username": "admin",
+      "password": "password",
+      "fullName": "Admin User",
+      "email": "admin@example.com",
+      "roleId": 1,
+      "isActive": true,
+      "createdAt": "2025-01-01T00:00:00Z",
+      "lastLogin": "2025-05-14T20:00:00Z"
+    },
+    {
+      "id": 2,
+      "username": "manager",
+      "password": "password",
+      "fullName": "Manager User",
+      "email": "manager@example.com",
+      "roleId": 2,
+      "isActive": true,
+      "createdAt": "2025-01-15T00:00:00Z",
+      "lastLogin": "2025-05-13T18:30:00Z"
+    },
+    {
+      "id": 3,
+      "username": "user",
+      "password": "password",
+      "fullName": "Regular User",
+      "email": "user@example.com",
+      "roleId": 3,
+      "isActive": true,
+      "createdAt": "2025-02-01T00:00:00Z",
+      "lastLogin": "2025-05-10T09:15:00Z"
+    }
+  ],
+  "roles": [
+    {
+      "id": 1,
+      "name": "Super Admin",
+      "permissions": [
+        "manage_users",
+        "manage_roles",
+        "view_dashboard",
+        "edit_settings"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Manager",
+      "permissions": ["view_dashboard", "manage_users"]
+    },
+    {
+      "id": 3,
+      "name": "User",
+      "permissions": ["view_dashboard"]
+    }
+  ],
+  "permissions": [
+    { "id": "manage_users", "description": "Can manage users" },
+    { "id": "manage_roles", "description": "Can manage roles" },
+    { "id": "view_dashboard", "description": "Can view dashboard" },
+    { "id": "edit_settings", "description": "Can edit application settings" }
+  ]
+}

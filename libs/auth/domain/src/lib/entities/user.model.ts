@@ -1,11 +1,15 @@
 export interface User {
   id: number;
   username: string;
-  email: string;
+  password?: string; // Optional in responses, required in requests
   fullName: string;
+  email?: string; // Optional email field
   roleId: number;
   role?: Role;
-  isSystemUser: boolean;
+  isSystemUser?: boolean;
+  isActive?: boolean;
+  createdAt?: string;
+  lastLogin?: string;
 }
 
 export interface Role {
@@ -14,12 +18,12 @@ export interface Role {
   permissions: string[];
 }
 
+export interface LoginRequest {
+  username: string;
+  password: string;
+}
+
 export interface AuthResponse {
   user: User;
   token: string;
-}
-
-export interface LoginRequest {
-  email: string;
-  password: string;
 }

@@ -1,9 +1,11 @@
 import {
   Directive,
+  Input,
   OnDestroy,
   OnInit,
   TemplateRef,
   ViewContainerRef,
+  inject,
   input,
 } from '@angular/core';
 import { Store } from '@ngrx/store';
@@ -16,7 +18,7 @@ import * as AuthSelectors from '../+state/auth.selectors';
   selector: '[hasRole]',
 })
 export class HasRoleDirective implements OnInit, OnDestroy {
-  hasRole = input<string | string[]>([]);
+  readonly hasRole = input<string | string[]>();
 
   private destroy$ = new Subject<void>();
 
@@ -31,8 +33,8 @@ export class HasRoleDirective implements OnInit, OnDestroy {
     this.store
       .select(AuthSelectors.selectUserRole)
       .pipe(takeUntil(this.destroy$))
-      .subscribe((role) => {
-        this.updateView(role);
+      .subscribe((userRole) => {
+        this.updateView(userRole);
       });
   }
 
@@ -54,6 +56,11 @@ export class HasRoleDirective implements OnInit, OnDestroy {
     // If no roles are required, show the element
     if (!roleInput || (Array.isArray(roleInput) && roleInput.length === 0)) {
       return true;
+    }
+
+    // If userRole is null, don't show the element
+    if (userRole === null) {
+      return false;
     }
 
     // Check if user has any of the required roles

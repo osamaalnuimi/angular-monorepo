@@ -23,11 +23,11 @@ export class AuthService {
     // In a real app, this would be a POST request to an authentication endpoint
     // For our mock backend, we'll query users and check credentials manually
     return this.http
-      .get<User[]>(`${this.API_URL}/users?email=${credentials.email}`)
+      .get<User[]>(`${this.API_URL}/users?username=${credentials.username}`)
       .pipe(
         switchMap((users) => {
           const user = users[0];
-          if (user && credentials.password === 'password') {
+          if (user && credentials.password === user.password) {
             // Simplified password check for demo
             // Get the user's role
             return this.http
@@ -46,58 +46,66 @@ export class AuthService {
                 })
               );
           } else {
-            return throwError(() => new Error('Invalid email or password'));
+            return throwError(() => new Error('Invalid username or password'));
           }
         }),
-        catchError((error) => throwError(() => error))
+        catchError((error) => {
+          return throwError(
+            () => new Error('Authentication failed: ' + error.message)
+          );
+        })
       );
   }
 
   logout(): void {
-    if (!this.isBrowser) return;
-    localStorage.removeItem(this.AUTH_TOKEN_KEY);
-    localStorage.removeItem(this.USER_DATA_KEY);
+    if (this.isBrowser) {
+      localStorage.removeItem(this.AUTH_TOKEN_KEY);
+      localStorage.removeItem(this.USER_DATA_KEY);
+    }
   }
 
-  hasPermission(permission: string, permissions: string[]): boolean {
-    return permissions.includes(permission);
+  isAuthenticated(): boolean {
+    if (!this.isBrowser) {
+      return false;
+    }
+    return !!this.getToken();
   }
 
-  hasRole(roleName: string, userRole: string | null): boolean {
-    return userRole === roleName;
+  getToken(): string | null {
+    if (!this.isBrowser) {
+      return null;
+    }
+    return localStorage.getItem(this.AUTH_TOKEN_KEY);
+  }
+
+  getCurrentUser(): User | null {
+    if (!this.isBrowser) {
+      return null;
+    }
+    const userData = localStorage.getItem(this.USER_DATA_KEY);
+    return userData ? JSON.parse(userData) : null;
+  }
+
+  hasPermission(permission: string, userPermissions: string[]): boolean {
+    return userPermissions.includes(permission);
+  }
+
+  hasRole(role: string, userRole: string | null): boolean {
+    return userRole !== null && userRole === role;
   }
 
   isSuperAdmin(userRole: string | null): boolean {
     return userRole === 'Super Admin';
   }
 
-  getCurrentUser(): User | null {
-    if (!this.isBrowser) return null;
-    const userData = localStorage.getItem(this.USER_DATA_KEY);
-    if (userData) {
-      try {
-        return JSON.parse(userData) as User;
-      } catch (e) {
-        return null;
-      }
-    }
-    return null;
-  }
-
   private setLocalStorage(user: User, token: string): void {
-    if (!this.isBrowser) return;
-    localStorage.setItem(this.AUTH_TOKEN_KEY, token);
-    localStorage.setItem(this.USER_DATA_KEY, JSON.stringify(user));
-  }
+    if (this.isBrowser) {
+      // Don't store sensitive information like password in localStorage
+      const userToStore = { ...user };
+      delete userToStore.password;
 
-  hasValidToken(): boolean {
-    // In a real app, you would check if the token is valid and not expired
-    if (!this.isBrowser) return false;
-    return !!localStorage.getItem(this.AUTH_TOKEN_KEY);
-  }
-
-  getToken(): string | null {
-    if (!this.isBrowser) return null;
-    return localStorage.getItem(this.AUTH_TOKEN_KEY);
+      localStorage.setItem(this.AUTH_TOKEN_KEY, token);
+      localStorage.setItem(this.USER_DATA_KEY, JSON.stringify(userToStore));
+    }
   }
 }

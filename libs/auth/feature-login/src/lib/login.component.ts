@@ -36,7 +36,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   private messageService = inject(MessageService);
   private destroy$ = new Subject<void>();
 
-  email = '';
+  username = '';
   password = '';
   checked = false;
   loading = false;
@@ -75,18 +75,18 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   onLogin(): void {
-    if (!this.email || !this.password) {
+    if (!this.username || !this.password) {
       this.messageService.add({
         severity: 'warn',
         summary: 'Validation Error',
-        detail: 'Email and password are required',
+        detail: 'Username and password are required',
         life: 3000,
       });
       return;
     }
 
     this.loginFacade.login({
-      email: this.email,
+      username: this.username,
       password: this.password,
     });
   }

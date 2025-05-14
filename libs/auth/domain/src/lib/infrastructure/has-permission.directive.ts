@@ -16,7 +16,9 @@ import * as AuthSelectors from '../+state/auth.selectors';
   selector: '[hasPermission]',
 })
 export class HasPermissionDirective implements OnInit, OnDestroy {
-  hasPermission = input<string | string[]>([]);
+  readonly permissionInput = input<string | string[] | undefined>(undefined, {
+    alias: 'hasPermission',
+  });
 
   private destroy$ = new Subject<void>();
 
@@ -50,23 +52,23 @@ export class HasPermissionDirective implements OnInit, OnDestroy {
   }
 
   private checkPermission(permissions: string[]): boolean {
-    const hasPermission = this.hasPermission();
     // If no permissions are required, show the element
+    const permissionInput = this.permissionInput();
     if (
-      !hasPermission ||
-      (Array.isArray(hasPermission) && hasPermission.length === 0)
+      !permissionInput ||
+      (Array.isArray(permissionInput) && permissionInput.length === 0)
     ) {
       return true;
     }
 
     // Check if user has any of the required permissions
-    if (Array.isArray(hasPermission)) {
-      return hasPermission.some((permission) =>
-        this.authService.hasPermission(permission, permissions)
+    if (Array.isArray(permissionInput)) {
+      return permissionInput.some((permission) =>
+        permissions.includes(permission)
       );
     }
 
     // Check single permission
-    return this.authService.hasPermission(hasPermission, permissions);
+    return permissions.includes(permissionInput);
   }
 }

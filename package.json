@@ -4,7 +4,8 @@
   "license": "MIT",
   "scripts": {
     "build": "nx build angular-case-study",
-    "serve": "nx serve angular-case-study"
+    "serve": "nx serve angular-case-study",
+    "mock-api": "json-server --watch tools/mock-api/db.json --port 3000 --middlewares tools/mock-api/auth-middleware.js"
   },
   "private": true,
   "dependencies": {
@@ -17,6 +18,10 @@
     "@angular/platform-server": "~19.2.0",
     "@angular/router": "~19.2.0",
     "@angular/ssr": "~19.2.0",
+    "@ngrx/effects": "~19.1.0",
+    "@ngrx/entity": "~19.1.0",
+    "@ngrx/store": "~19.1.0",
+    "@ngrx/store-devtools": "~19.1.0",
     "@primeng/themes": "^19.1.2",
     "@types/d3": "^7.4.3",
     "d3": "^7.9.0",
@@ -58,6 +63,7 @@
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "jest-preset-angular": "~14.4.0",
+    "json-server": "0.17.4",
     "jsonc-eslint-parser": "^2.1.0",
     "ng-packagr": "~19.2.0",
     "nx": "21.0.3",
