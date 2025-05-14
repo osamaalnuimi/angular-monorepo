@@ -1,4 +1,8 @@
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import {
+  ApplicationConfig,
+  provideZoneChangeDetection,
+  isDevMode,
+} from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { appRoutes } from './app.routes';
 import {
@@ -8,6 +12,18 @@ import {
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeng/themes/aura';
+import {
+  provideHttpClient,
+  withFetch,
+  withInterceptors,
+} from '@angular/common/http';
+import { provideStore } from '@ngrx/store';
+import { provideEffects } from '@ngrx/effects';
+import { provideStoreDevtools } from '@ngrx/store-devtools';
+
+// Auth NgRx
+import { authFeature, AuthEffects } from '@angular-monorepo/auth/domain';
+import { authInterceptor } from '@angular-monorepo/auth/domain';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -25,6 +41,22 @@ export const appConfig: ApplicationConfig = {
           },
         },
       },
+    }),
+    // HTTP Client with auth interceptor
+    provideHttpClient(withFetch(), withInterceptors([authInterceptor])),
+
+    // NgRx Store
+    provideStore({
+      // Use the feature instead of just the reducer
+      [authFeature.name]: authFeature.reducer,
+    }),
+    provideEffects([AuthEffects]),
+    provideStoreDevtools({
+      maxAge: 25,
+      logOnly: !isDevMode(),
+      autoPause: true,
+      trace: false,
+      traceLimit: 75,
     }),
   ],
 };
