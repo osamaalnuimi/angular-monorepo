@@ -15,6 +15,15 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@angular-monorepo/auth/domain": ["libs/auth/domain/src/index.ts"],
+      "@angular-monorepo/auth/feature-login": [
+        "libs/auth/feature-login/src/index.ts"
+      ],
+      "@angular-monorepo/layout/api": ["libs/layout/api/src/index.ts"],
+      "@angular-monorepo/layout/domain": ["libs/layout/domain/src/index.ts"],
+      "@angular-monorepo/layout/feature-layout": [
+        "libs/layout/feature-layout/src/index.ts"
+      ],
       "@angular-monorepo/visualizations/domain": [
         "libs/visualizations/domain/src/index.ts"
       ],
