@@ -41,9 +41,9 @@ export const appRoutes: Route[] = [
       //   },
       {
         path: 'roles',
-        loadComponent: () =>
-          import('@angular-monorepo/roles/feature-manage').then(
-            (m) => m.ManageComponent
+        loadChildren: () =>
+          import('@angular-monorepo/roles/feature-shell').then(
+            (m) => m.rolesShellRoutes
           ),
       },
     ],

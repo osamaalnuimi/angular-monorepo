@@ -1,0 +1,36 @@
+{
+  "name": "roles-ui-manage-form",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/roles/ui-manage-form/src",
+  "prefix": "roles-ui-manage-form",
+  "projectType": "library",
+  "tags": ["domain:roles", "type:ui"],
+  "targets": {
+    "build": {
+      "executor": "@nx/angular:ng-packagr-lite",
+      "outputs": ["{workspaceRoot}/dist/{projectRoot}"],
+      "options": {
+        "project": "libs/roles/ui-manage-form/ng-package.json"
+      },
+      "configurations": {
+        "production": {
+          "tsConfig": "libs/roles/ui-manage-form/tsconfig.lib.prod.json"
+        },
+        "development": {
+          "tsConfig": "libs/roles/ui-manage-form/tsconfig.lib.json"
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "libs/roles/ui-manage-form/jest.config.ts"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}

@@ -22,6 +22,7 @@ import { MenubarModule } from 'primeng/menubar';
 import { Ripple } from 'primeng/ripple';
 import { StyleClass } from 'primeng/styleclass';
 import { Subject } from 'rxjs';
+import { HasPermissionPipe } from './has-permission.pipe';
 
 @Component({
   imports: [
@@ -38,6 +39,7 @@ import { Subject } from 'rxjs';
     Ripple,
     RouterOutlet,
     RouterLink,
+    HasPermissionPipe,
   ],
   selector: 'layout-feature-layout',
   templateUrl: './layout.component.html',
