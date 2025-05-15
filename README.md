@@ -1,38 +1,86 @@
-# World Demographics Visualization
+# Angular Monorepo with Role-Based Access Control
 
 ![Angular](https://img.shields.io/badge/Angular-DD0031?style=for-the-badge&logo=angular&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![NgRx](https://img.shields.io/badge/NgRx-BA2BD2?style=for-the-badge&logo=redux&logoColor=white)
 ![D3.js](https://img.shields.io/badge/D3.js-F9A03C?style=for-the-badge&logo=d3.js&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![PrimeNG](https://img.shields.io/badge/PrimeNG-DD0031?style=for-the-badge&logo=primeng&logoColor=white)
 
-An interactive data visualization project built with Angular and D3.js that displays world demographics data using circle packing visualization techniques. The application allows users to explore population and land area statistics by continent, region, and country.
+A comprehensive Angular monorepo showcasing modern Angular development practices with multiple applications:
 
-## Features
+1. **User Management System** - A role-based access control system with user and permission management
+2. **World Demographics Visualization** - An interactive data visualization application built with D3.js that displays world demographics data using circle packing visualization techniques
 
-- **Interactive Circle Packing Visualization**: Explore hierarchical data with an intuitive, interactive interface
-- **Continent Selection**: Filter data by continent to focus on specific geographical areas
-- **Metric Toggle**: Switch between population and land area metrics
-- **Responsive Design**: Optimized for various screen sizes with horizontal layout for wide screens
-- **Loading & Error States**: User-friendly feedback during data loading and error handling
+## Project Overview
+
+This project demonstrates a well-structured Angular monorepo using Nx, with a focus on:
+
+- Domain-Driven Design principles
+- Smart/Dumb component architecture
+- NgRx state management
+- Modern Angular features (signals, control flow, etc.)
+- Role-based access control
+- Docker containerization
 
 ## Project Architecture
-
-This project follows Domain-Driven Design principles within an Angular monorepo structure:
 
 ```
 angular-monorepo/
 ├── apps/
-│   └── angular-case-study/      # Main application
-├── libs/
-│   └── visualizations/
-│       ├── domain/              # Domain layer (entities, interfaces)
-│       ├── feature-world-demographics/  # Feature components (smart)
-│       └── ui-circle-packging-visualization/  # UI components (dumb)
-├── docs/
-│   ├── adr/                     # Architecture Decision Records
-│   └── tdr/                     # Technical Decision Records
-└── Dockerfile                   # Docker configuration
+│   ├── angular-case-study/      # World Demographics visualization app
+│   │   └── Dockerfile           # App-specific Docker configuration
+│   └── users-management/        # User Management application
+│       └── Dockerfile           # App-specific Docker configuration
+├── libs/                        # Shared libraries (domain-driven design)
+│   ├── auth/                    # Authentication and authorization
+│   │   ├── domain/              # Auth domain models and services
+│   │   └── feature-login/       # Login feature components
+│   ├── layout/                  # Layout components
+│   │   ├── api/                 # Layout API interfaces
+│   │   ├── domain/              # Layout domain models
+│   │   ├── feature-landing/     # Landing page feature
+│   │   └── feature-layout/      # Main layout with navigation
+│   ├── roles/                   # Role management
+│   │   ├── domain/              # Role domain models and state
+│   │   ├── feature-manage/      # Role management components
+│   │   ├── feature-shell/       # Role feature routing
+│   │   └── ui-manage-form/      # Role form UI components
+│   ├── users/                   # User management
+│   │   ├── domain/              # User domain models and state
+│   │   ├── feature-manage/      # User management components
+│   │   ├── feature-shell/       # User feature routing
+│   │   └── ui-user-form/        # User form UI components
+│   └── visualizations/          # Data visualization components
+│       ├── domain/              # Visualization domain models
+│       ├── feature-world-demographics/  # World demographics feature
+│       └── ui-circle-packging/  # Circle packing visualization UI
+├── tools/
+│   └── mock-api/               # Mock API server with JSON Server
+│       ├── db.json             # Mock database
+│       ├── auth-middleware.js  # Authentication middleware
+│       └── Dockerfile          # Mock API Docker configuration
+└── docker-compose.yml          # Docker Compose configuration for all services
 ```
+
+## Features
+
+### User Management System
+
+- **User Management**: Create, view, edit, and delete users with role assignments
+- **Role-Based Access Control**: Assign roles with specific permissions to users
+- **Permission-Based UI**: Dynamic UI elements that show/hide based on user permissions
+- **Form Validation**: Comprehensive validation including async username uniqueness checks
+- **Secure Authentication**: JWT-based authentication with proper token management
+- **Modern Angular Patterns**: Uses signals, computed values, and modern control flow syntax
+
+### World Demographics Visualization
+
+- **Interactive Circle Packing Visualization**: Explore hierarchical data with an intuitive, interactive interface built with D3.js
+- **Continent Selection**: Filter data by continent to focus on specific geographical areas
+- **Metric Toggle**: Switch between population and land area metrics
+- **Responsive Design**: Optimized for various screen sizes with horizontal layout for wide screens
+- **Loading & Error States**: User-friendly feedback during data loading and error handling
 
 ## Getting Started
 
@@ -40,7 +88,7 @@ angular-monorepo/
 
 - Node.js (v18 or later)
 - npm (v9 or later)
-- Docker (optional, for containerized deployment)
+- Docker and Docker Compose (optional, for containerized deployment)
 
 ### Installation
 
@@ -57,191 +105,101 @@ angular-monorepo/
    npm install
    ```
 
-3. Start the development server:
+### Running the Applications
 
-   ```sh
-   npx nx serve angular-case-study
-   ```
+#### User Management System
 
-4. Open your browser and navigate to `http://localhost:4200`
-
-### Docker Deployment
-
-To build and run the application using Docker:
-
-1. Build the Docker image:
-
-   ```sh
-   docker build -t world-demographics-viz .
-   ```
-
-2. Run the container:
-
-   ```sh
-   docker run -p 4000:4000 world-demographics-viz
-   ```
-
-3. Access the application at `http://localhost:4000`
-
-## Development
-
-### Generate a new library
-
-```sh
-npx nx g @nx/angular:lib my-lib --directory=visualizations
-```
-
-### Generate a component
-
-```sh
-npx nx g @nx/angular:component my-component --project=visualizations-ui-circle-packging-visualization
-```
-
-### Running tests
-
-```sh
-# Run tests for all projects
-npx nx run-many --target=test --all
-
-# Run tests for a specific project
-npx nx test visualizations-ui-circle-packging
-```
-
-## Documentation
-
-For more detailed information about the project architecture and technical decisions, see:
-
-- [Architecture Decision Records](./docs/adr/README.md)
-- [Technical Decision Records](./docs/tdr/README.md)
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
----
-
-# User Management System
-
-![Angular](https://img.shields.io/badge/Angular-DD0031?style=for-the-badge&logo=angular&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
-![NgRx](https://img.shields.io/badge/NgRx-BA2BD2?style=for-the-badge&logo=redux&logoColor=white)
-
-A comprehensive role-based access control system that manages users and their permissions throughout the application.
-
-## Features
-
-- **User Management**: Create, view, edit, and delete users with role assignments
-- **Role-Based Access Control**: Assign roles with specific permissions to users
-- **Permission-Based UI**: Dynamic UI elements that show/hide based on user permissions
-- **Form Validation**: Comprehensive validation including async username uniqueness checks
-- **Secure Authentication**: JWT-based authentication with proper token management
-- **Modern Angular Patterns**: Uses signals, computed values, and modern control flow syntax
-
-## Project Architecture
-
-The user management system follows Domain-Driven Design principles within the Angular monorepo:
-
-```
-angular-monorepo/
-├── libs/
-│   ├── auth/
-│   │   ├── domain/              # Authentication domain models and services
-│   │   └── feature-login/       # Login feature components
-│   ├── roles/
-│   │   ├── domain/              # Role domain models and state management
-│   │   ├── feature-manage/      # Role management feature components
-│   │   ├── feature-shell/       # Role feature shell and routing
-│   │   └── ui-manage-form/      # Role form UI components
-│   └── users/
-│       ├── domain/              # User domain models and state management
-│       ├── feature-manage/      # User management feature components
-│       ├── feature-shell/       # User feature shell and routing
-│       └── ui-user-form/        # User form UI components with validation
-```
-
-## Implementation Details
-
-- **NgRx State Management**: Predictable state updates through actions, reducers, and effects
-- **Smart/Dumb Component Pattern**: Clear separation between presentational and container components
-- **Reactive Forms**: Advanced form handling with custom validators
-- **Permission Directives**: Structural directives for conditional UI rendering based on permissions
-- **Route Guards**: Functional guards for route protection based on authentication and permissions
-
-## Running the User Management System
-
-### Prerequisites
-
-- Node.js (v18 or later)
-- npm (v9 or later)
-- Docker and Docker Compose (optional, for containerized deployment)
-
-### Local Development
-
-1. Install dependencies:
-
-   ```sh
-   npm install
-   ```
-
-2. Start the mock API server:
+1. Start the mock API server:
 
    ```sh
    npm run mock-api
    ```
 
-3. In a separate terminal, start the user management application:
+2. In a separate terminal, start the user management application:
 
    ```sh
    npm run users-management
    ```
 
-4. Open your browser and navigate to `http://localhost:4200`
+3. Open your browser and navigate to `http://localhost:4200`
 
-5. Login with the following credentials:
+4. Login with the following credentials:
    - Username: `admin`
    - Password: `password`
 
-### Building for Production
+#### World Demographics Visualization
 
-To build the user management application for production:
+1. Start the application:
 
-```sh
-npm run users-management:build
-```
+   ```sh
+   npm run serve
+   ```
 
-The build output will be in the `dist/apps/users-management` directory.
+2. Open your browser and navigate to `http://localhost:4200`
 
 ### Docker Deployment
 
-The project includes Docker configuration for both the user management application and the mock API server.
+The project includes Docker configuration for all applications:
 
-1. Build and run using Docker Compose:
+1. Build and run all applications using Docker Compose:
 
    ```sh
    docker-compose up --build
    ```
 
-2. Access the application at `http://localhost:4200`
+2. Access the applications at:
+   - User Management: `http://localhost:4200`
+   - World Demographics: `http://localhost:4000`
+   - Mock API Server: `http://localhost:3000`
 
-3. The mock API server will be available at `http://localhost:3000`
-
-To run only the user management application:
+To run individual applications:
 
 ```sh
+# User Management
 docker build -t user-management -f apps/users-management/Dockerfile .
 docker run -p 4200:4200 user-management
-```
 
-To run only the mock API server:
+# World Demographics
+docker build -t world-demographics -f apps/angular-case-study/Dockerfile .
+docker run -p 4000:4000 world-demographics
 
-```sh
+# Mock API
 docker build -t mock-api -f tools/mock-api/Dockerfile .
 docker run -p 3000:3000 mock-api
 ```
 
+## Implementation Details
+
+### NgRx State Management
+
+The application uses NgRx for state management with:
+
+- **State**: Well-defined interfaces for application state
+- **Actions**: Strongly-typed action creators for all operations
+- **Reducers**: Pure functions for state updates
+- **Effects**: Side effects for API calls and notifications
+- **Facades**: Clean API for components to interact with the store
+
+### Component Architecture
+
+The project follows a smart/dumb component pattern:
+
+- **Smart Components**: Handle business logic, state management, and service dependencies
+- **Dumb Components**: Focus on UI concerns, receive data via inputs, and emit events via outputs
+- **Separation of Concerns**: Clear boundaries between presentation and business logic
+
+### Modern Angular Features
+
+The application showcases modern Angular features:
+
+- **Signals**: For reactive state management within components
+- **Control Flow**: Using @if/@for syntax in templates
+- **Functional Guards**: For route protection
+- **Standalone Components**: For better tree-shaking and modularity
+
 ## Mock API Server
 
-The project uses JSON Server to provide a mock backend API. The mock server includes:
+The project uses JSON Server to provide a mock backend API with:
 
 - User authentication with JWT tokens
 - CRUD operations for users and roles

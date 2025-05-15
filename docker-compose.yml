@@ -27,6 +27,16 @@ services:
     networks:
       - app-network
 
+  # World Demographics Application
+  angular-case-study:
+    build:
+      context: .
+      dockerfile: apps/angular-case-study/Dockerfile
+    ports:
+      - '4000:4000'
+    networks:
+      - app-network
+
 networks:
   app-network:
     driver: bridge
