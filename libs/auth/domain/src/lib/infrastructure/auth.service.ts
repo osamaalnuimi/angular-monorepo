@@ -29,6 +29,14 @@ export class AuthService {
           const user = users[0];
           if (user && credentials.password === user.password) {
             // Simplified password check for demo
+
+            // Create a mock token (in a real app, this would come from the server)
+            const token = `mock-jwt-token-${Date.now()}`;
+
+            // Store auth data in localStorage IMMEDIATELY
+            // We'll update the user object with role data later
+            this.setLocalStorage(user, token);
+
             // Get the user's role
             return this.http
               .get<Role>(`${this.API_URL}/roles/${user.roleId}`)
@@ -36,11 +44,8 @@ export class AuthService {
                 map((role) => {
                   user.role = role;
 
-                  // Create a mock token (in a real app, this would come from the server)
-                  const token = `mock-jwt-token-${Date.now()}`;
-
-                  // Store auth data in localStorage
-                  this.setLocalStorage(user, token);
+                  // Update user data in localStorage with role information
+                  this.updateUserInLocalStorage(user);
 
                   return user;
                 })
@@ -99,12 +104,23 @@ export class AuthService {
   }
 
   private setLocalStorage(user: User, token: string): void {
+    console.log('Setting token in localStorage:', token, this.isBrowser);
+
     if (this.isBrowser) {
       // Don't store sensitive information like password in localStorage
       const userToStore = { ...user };
       delete userToStore.password;
 
       localStorage.setItem(this.AUTH_TOKEN_KEY, token);
+      localStorage.setItem(this.USER_DATA_KEY, JSON.stringify(userToStore));
+    }
+  }
+
+  private updateUserInLocalStorage(user: User): void {
+    if (this.isBrowser) {
+      const userToStore = { ...user };
+      delete userToStore.password;
+
       localStorage.setItem(this.USER_DATA_KEY, JSON.stringify(userToStore));
     }
   }

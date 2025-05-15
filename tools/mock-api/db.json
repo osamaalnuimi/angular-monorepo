@@ -39,27 +39,42 @@
       "id": 1,
       "name": "Super Admin",
       "permissions": [
-        "manage_users",
-        "manage_roles",
-        "view_dashboard",
-        "edit_settings"
+        "view:users",
+        "create:users",
+        "edit:users",
+        "delete:users",
+        "view:roles",
+        "create:roles",
+        "edit:roles",
+        "delete:roles",
+        "view:dashboard"
       ]
     },
     {
       "id": 2,
       "name": "Manager",
-      "permissions": ["view_dashboard", "manage_users"]
+      "permissions": [
+        "view:dashboard",
+        "view:users",
+        "create:users",
+        "edit:users"
+      ]
     },
     {
       "id": 3,
       "name": "User",
-      "permissions": ["view_dashboard"]
+      "permissions": ["view:dashboard"]
     }
   ],
   "permissions": [
-    { "id": "manage_users", "description": "Can manage users" },
-    { "id": "manage_roles", "description": "Can manage roles" },
-    { "id": "view_dashboard", "description": "Can view dashboard" },
-    { "id": "edit_settings", "description": "Can edit application settings" }
+    { "label": "View Users", "value": "view:users" },
+    { "label": "Create Users", "value": "create:users" },
+    { "label": "Edit Users", "value": "edit:users" },
+    { "label": "Delete Users", "value": "delete:users" },
+    { "label": "View Roles", "value": "view:roles" },
+    { "label": "Create Roles", "value": "create:roles" },
+    { "label": "Edit Roles", "value": "edit:roles" },
+    { "label": "Delete Roles", "value": "delete:roles" },
+    { "label": "View Dashboard", "value": "view:dashboard" }
   ]
 }

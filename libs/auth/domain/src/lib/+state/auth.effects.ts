@@ -48,8 +48,8 @@ export class AuthEffects {
       ofType(AuthActions.logout),
       tap(() => {
         this.authService.logout();
-        return AuthActions.logoutSuccess();
-      })
+      }),
+      map(() => AuthActions.logoutSuccess())
     )
   );
 

@@ -1,17 +1,27 @@
-import { Component, OnInit, OnDestroy, viewChild } from '@angular/core';
+import { LoginFacade, User } from '@angular-monorepo/auth/domain';
+import {
+  Component,
+  inject,
+  OnDestroy,
+  OnInit,
+  signal,
+  viewChild,
+  effect,
+} from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { FormsModule } from '@angular/forms';
+import { RouterOutlet, RouterLink } from '@angular/router';
+import { MenuItem } from 'primeng/api';
 import { AvatarModule } from 'primeng/avatar';
+import { BadgeModule } from 'primeng/badge';
 import { ButtonModule } from 'primeng/button';
 import { Drawer, DrawerModule } from 'primeng/drawer';
+import { InputSwitchModule } from 'primeng/inputswitch';
+import { InputTextModule } from 'primeng/inputtext';
+import { MenubarModule } from 'primeng/menubar';
 import { Ripple } from 'primeng/ripple';
 import { StyleClass } from 'primeng/styleclass';
-import { MenubarModule } from 'primeng/menubar';
-import { BadgeModule } from 'primeng/badge';
-import { InputTextModule } from 'primeng/inputtext';
-import { MenuItem } from 'primeng/api';
-import { RouterModule } from '@angular/router';
-import { LoginFacade } from '@angular-monorepo/auth/domain';
-import { Subject, takeUntil } from 'rxjs';
-import { User } from '@angular-monorepo/auth/domain';
+import { Subject } from 'rxjs';
 
 @Component({
   imports: [
@@ -23,8 +33,11 @@ import { User } from '@angular-monorepo/auth/domain';
     MenubarModule,
     BadgeModule,
     InputTextModule,
+    InputSwitchModule,
+    FormsModule,
     Ripple,
-    RouterModule,
+    RouterOutlet,
+    RouterLink,
   ],
   selector: 'layout-feature-layout',
   templateUrl: './layout.component.html',
@@ -32,25 +45,36 @@ import { User } from '@angular-monorepo/auth/domain';
 })
 export class LayoutComponent implements OnInit, OnDestroy {
   drawerRef = viewChild.required<Drawer>('drawerRef');
+
+  private loginFacade = inject(LoginFacade);
+
   items: MenuItem[] | undefined;
-  user: User | null = null;
+
+  // Convert observables to signals
+  user = toSignal(this.loginFacade.user$, {
+    initialValue: null as User | null,
+  });
+  userPermissions = toSignal(this.loginFacade.userPermissions$, {
+    initialValue: [] as string[],
+  });
+
+  // UI state
+  visible = signal(false);
+  darkMode = signal(false);
+
   private destroy$ = new Subject<void>();
 
-  constructor(private loginFacade: LoginFacade) {}
+  constructor() {
+    // Set up effect to apply dark mode when the signal changes
+    effect(() => {
+      this.applyDarkMode();
+      localStorage.setItem('darkMode', this.darkMode().toString());
+    });
+  }
 
   ngOnInit(): void {
-    // Subscribe to user information
-    this.loginFacade.user$.pipe(takeUntil(this.destroy$)).subscribe((user) => {
-      this.user = user;
-      this.setupNavigationItems();
-    });
-
-    // Subscribe to user permissions
-    this.loginFacade.userPermissions$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.setupNavigationItems();
-      });
+    this.setupNavigationItems();
+    this.initDarkMode();
   }
 
   ngOnDestroy(): void {
@@ -59,24 +83,9 @@ export class LayoutComponent implements OnInit, OnDestroy {
   }
 
   setupNavigationItems(): void {
+    // The header menu will now be minimal or empty since we moved navigation to the drawer
     this.items = [
-      {
-        label: 'Dashboard',
-        icon: 'pi pi-home',
-        routerLink: '/dashboard',
-      },
-      {
-        label: 'Users',
-        icon: 'pi pi-users',
-        routerLink: '/users',
-        visible: this.hasPermission('manage_users'),
-      },
-      {
-        label: 'Roles',
-        icon: 'pi pi-cog',
-        routerLink: '/roles',
-        visible: this.hasPermission('manage_roles'),
-      },
+      // Empty or add any global actions here if needed
     ];
   }
 
@@ -88,9 +97,32 @@ export class LayoutComponent implements OnInit, OnDestroy {
     this.loginFacade.logout();
   }
 
-  hasPermission(permission: string): boolean {
-    return this.user?.role?.permissions?.includes(permission) || false;
+  toggleDarkMode() {
+    this.darkMode.update((current) => !current);
   }
 
-  visible = false;
+  private initDarkMode() {
+    // Check for saved dark mode preference
+    const savedDarkMode = localStorage.getItem('darkMode');
+    if (savedDarkMode) {
+      this.darkMode.set(savedDarkMode === 'true');
+    } else {
+      // Check for system preference
+      const prefersDark = window.matchMedia(
+        '(prefers-color-scheme: dark)'
+      ).matches;
+      this.darkMode.set(prefersDark);
+    }
+
+    // Apply dark mode on initialization
+    this.applyDarkMode();
+  }
+
+  private applyDarkMode() {
+    if (this.darkMode()) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }
 }

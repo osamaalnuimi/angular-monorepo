@@ -25,13 +25,13 @@ export const appRoutes: Route[] = [
         pathMatch: 'full',
         redirectTo: 'dashboard',
       },
-      //   {
-      //     path: 'dashboard',
-      //     loadComponent: () =>
-      //       import('./features/dashboard/dashboard.component').then(
-      //         (m) => m.DashboardComponent
-      //       ),
-      //   },
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('@angular-monorepo/layout/feature-landing').then(
+            (m) => m.LandingComponent
+          ),
+      },
       //   {
       //     path: 'users',
       //     loadComponent: () =>
@@ -39,13 +39,13 @@ export const appRoutes: Route[] = [
       //         (m) => m.UsersComponent
       //       ),
       //   },
-      //   {
-      //     path: 'roles',
-      //     loadComponent: () =>
-      //       import('./features/roles/roles.component').then(
-      //         (m) => m.RolesComponent
-      //       ),
-      //   },
+      {
+        path: 'roles',
+        loadComponent: () =>
+          import('@angular-monorepo/roles/feature-manage').then(
+            (m) => m.ManageComponent
+          ),
+      },
     ],
   },
 
