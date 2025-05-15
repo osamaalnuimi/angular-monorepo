@@ -65,7 +65,17 @@ export const authFeature = createFeature({
 // Create additional selectors using createSelector
 export const selectUserPermissions = createSelector(
   authFeature.selectUser,
-  (user) => user?.role?.permissions || []
+  (user) => {
+    // Get the user's permissions from their role
+    const rolePermissions = user?.role?.permissions || [];
+
+    // Ensure all users have access to the dashboard
+    if (!rolePermissions.includes('view:dashboard')) {
+      return [...rolePermissions, 'view:dashboard'];
+    }
+
+    return rolePermissions;
+  }
 );
 
 export const selectUserRole = createSelector(

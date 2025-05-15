@@ -1,0 +1,36 @@
+{
+  "name": "users-ui-user-form",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/users/ui-user-form/src",
+  "prefix": "users-ui-user-form",
+  "projectType": "library",
+  "tags": ["domain:users", "type:ui"],
+  "targets": {
+    "build": {
+      "executor": "@nx/angular:ng-packagr-lite",
+      "outputs": ["{workspaceRoot}/dist/{projectRoot}"],
+      "options": {
+        "project": "libs/users/ui-user-form/ng-package.json"
+      },
+      "configurations": {
+        "production": {
+          "tsConfig": "libs/users/ui-user-form/tsconfig.lib.prod.json"
+        },
+        "development": {
+          "tsConfig": "libs/users/ui-user-form/tsconfig.lib.json"
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "libs/users/ui-user-form/jest.config.ts"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}

@@ -120,6 +120,137 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ---
 
+# User Management System
+
+![Angular](https://img.shields.io/badge/Angular-DD0031?style=for-the-badge&logo=angular&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![NgRx](https://img.shields.io/badge/NgRx-BA2BD2?style=for-the-badge&logo=redux&logoColor=white)
+
+A comprehensive role-based access control system that manages users and their permissions throughout the application.
+
+## Features
+
+- **User Management**: Create, view, edit, and delete users with role assignments
+- **Role-Based Access Control**: Assign roles with specific permissions to users
+- **Permission-Based UI**: Dynamic UI elements that show/hide based on user permissions
+- **Form Validation**: Comprehensive validation including async username uniqueness checks
+- **Secure Authentication**: JWT-based authentication with proper token management
+- **Modern Angular Patterns**: Uses signals, computed values, and modern control flow syntax
+
+## Project Architecture
+
+The user management system follows Domain-Driven Design principles within the Angular monorepo:
+
+```
+angular-monorepo/
+├── libs/
+│   ├── auth/
+│   │   ├── domain/              # Authentication domain models and services
+│   │   └── feature-login/       # Login feature components
+│   ├── roles/
+│   │   ├── domain/              # Role domain models and state management
+│   │   ├── feature-manage/      # Role management feature components
+│   │   ├── feature-shell/       # Role feature shell and routing
+│   │   └── ui-manage-form/      # Role form UI components
+│   └── users/
+│       ├── domain/              # User domain models and state management
+│       ├── feature-manage/      # User management feature components
+│       ├── feature-shell/       # User feature shell and routing
+│       └── ui-user-form/        # User form UI components with validation
+```
+
+## Implementation Details
+
+- **NgRx State Management**: Predictable state updates through actions, reducers, and effects
+- **Smart/Dumb Component Pattern**: Clear separation between presentational and container components
+- **Reactive Forms**: Advanced form handling with custom validators
+- **Permission Directives**: Structural directives for conditional UI rendering based on permissions
+- **Route Guards**: Functional guards for route protection based on authentication and permissions
+
+## Running the User Management System
+
+### Prerequisites
+
+- Node.js (v18 or later)
+- npm (v9 or later)
+- Docker and Docker Compose (optional, for containerized deployment)
+
+### Local Development
+
+1. Install dependencies:
+
+   ```sh
+   npm install
+   ```
+
+2. Start the mock API server:
+
+   ```sh
+   npm run mock-api
+   ```
+
+3. In a separate terminal, start the user management application:
+
+   ```sh
+   npm run users-management
+   ```
+
+4. Open your browser and navigate to `http://localhost:4200`
+
+5. Login with the following credentials:
+   - Username: `admin`
+   - Password: `password`
+
+### Building for Production
+
+To build the user management application for production:
+
+```sh
+npm run users-management:build
+```
+
+The build output will be in the `dist/apps/users-management` directory.
+
+### Docker Deployment
+
+The project includes Docker configuration for both the user management application and the mock API server.
+
+1. Build and run using Docker Compose:
+
+   ```sh
+   docker-compose up --build
+   ```
+
+2. Access the application at `http://localhost:4200`
+
+3. The mock API server will be available at `http://localhost:3000`
+
+To run only the user management application:
+
+```sh
+docker build -t user-management -f apps/users-management/Dockerfile .
+docker run -p 4200:4200 user-management
+```
+
+To run only the mock API server:
+
+```sh
+docker build -t mock-api -f tools/mock-api/Dockerfile .
+docker run -p 3000:3000 mock-api
+```
+
+## Mock API Server
+
+The project uses JSON Server to provide a mock backend API. The mock server includes:
+
+- User authentication with JWT tokens
+- CRUD operations for users and roles
+- Permission-based access control
+
+The mock data is defined in `tools/mock-api/db.json` and can be customized as needed.
+
+---
+
 # Original Nx Workspace Documentation
 
 <details>

@@ -92,6 +92,10 @@ export class AuthService {
   }
 
   hasPermission(permission: string, userPermissions: string[]): boolean {
+    // Default permission for all users to access the dashboard/landing page
+    if (permission === 'view:dashboard') {
+      return true;
+    }
     return userPermissions.includes(permission);
   }
 

@@ -1,5 +1,5 @@
 import { Route } from '@angular/router';
-import { AuthGuard } from '@angular-monorepo/auth/domain';
+import { AuthGuard, hasPermission } from '@angular-monorepo/auth/domain';
 
 export const appRoutes: Route[] = [
   // Public routes
@@ -32,19 +32,21 @@ export const appRoutes: Route[] = [
             (m) => m.LandingComponent
           ),
       },
-      //   {
-      //     path: 'users',
-      //     loadComponent: () =>
-      //       import('./features/users/users.component').then(
-      //         (m) => m.UsersComponent
-      //       ),
-      //   },
+      {
+        path: 'users',
+        loadChildren: () =>
+          import('@angular-monorepo/users/feature-shell').then(
+            (m) => m.usersShellRoutes
+          ),
+        canActivate: [hasPermission('view:users')],
+      },
       {
         path: 'roles',
         loadChildren: () =>
           import('@angular-monorepo/roles/feature-shell').then(
             (m) => m.rolesShellRoutes
           ),
+        canActivate: [hasPermission('view:roles')],
       },
     ],
   },

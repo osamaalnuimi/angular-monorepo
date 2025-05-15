@@ -3,10 +3,14 @@ import { User } from '@angular-monorepo/auth/domain';
 
 @Pipe({
   name: 'hasPermission',
-  standalone: true,
 })
 export class HasPermissionPipe implements PipeTransform {
   transform(user: User | null, permission: string): boolean {
+    // Special case for dashboard - all users should have access
+    if (permission === 'view:dashboard') {
+      return true;
+    }
+
     if (!user || !user.role || !user.role.permissions) {
       return false;
     }

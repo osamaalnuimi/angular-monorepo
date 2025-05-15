@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  # Mock API service
+  mock-api:
+    build:
+      context: .
+      dockerfile: tools/mock-api/Dockerfile
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./tools/mock-api:/app/tools/mock-api
+    networks:
+      - app-network
+
+  # User Management Application
+  users-management:
+    build:
+      context: .
+      dockerfile: apps/users-management/Dockerfile
+    ports:
+      - '4200:4200'
+    depends_on:
+      - mock-api
+    environment:
+      - API_URL=http://mock-api:3000
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

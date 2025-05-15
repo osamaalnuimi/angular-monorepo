@@ -40,6 +40,11 @@ export const hasPermission = (permission: string): CanActivateFn => {
           return of(router.createUrlTree(['/login']));
         }
 
+        // Always allow access to dashboard for authenticated users
+        if (permission === 'view:dashboard') {
+          return of(true);
+        }
+
         return store.select(AuthSelectors.selectUserPermissions).pipe(
           take(1),
           map((permissions) => {

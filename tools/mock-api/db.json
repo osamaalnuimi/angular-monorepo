@@ -32,6 +32,15 @@
       "isActive": true,
       "createdAt": "2025-02-01T00:00:00Z",
       "lastLogin": "2025-05-10T09:15:00Z"
+    },
+    {
+      "username": "user_2",
+      "password": "password",
+      "fullName": "password",
+      "email": "",
+      "roleId": 2,
+      "isActive": true,
+      "id": 4
     }
   ],
   "roles": [
@@ -63,18 +72,47 @@
     {
       "id": 3,
       "name": "User",
-      "permissions": ["view:dashboard"]
+      "permissions": [
+        "view:dashboard"
+      ]
     }
   ],
   "permissions": [
-    { "label": "View Users", "value": "view:users" },
-    { "label": "Create Users", "value": "create:users" },
-    { "label": "Edit Users", "value": "edit:users" },
-    { "label": "Delete Users", "value": "delete:users" },
-    { "label": "View Roles", "value": "view:roles" },
-    { "label": "Create Roles", "value": "create:roles" },
-    { "label": "Edit Roles", "value": "edit:roles" },
-    { "label": "Delete Roles", "value": "delete:roles" },
-    { "label": "View Dashboard", "value": "view:dashboard" }
+    {
+      "label": "View Users",
+      "value": "view:users"
+    },
+    {
+      "label": "Create Users",
+      "value": "create:users"
+    },
+    {
+      "label": "Edit Users",
+      "value": "edit:users"
+    },
+    {
+      "label": "Delete Users",
+      "value": "delete:users"
+    },
+    {
+      "label": "View Roles",
+      "value": "view:roles"
+    },
+    {
+      "label": "Create Roles",
+      "value": "create:roles"
+    },
+    {
+      "label": "Edit Roles",
+      "value": "edit:roles"
+    },
+    {
+      "label": "Delete Roles",
+      "value": "delete:roles"
+    },
+    {
+      "label": "View Dashboard",
+      "value": "view:dashboard"
+    }
   ]
 }
