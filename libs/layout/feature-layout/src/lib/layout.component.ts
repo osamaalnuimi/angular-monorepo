@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { RouterOutlet, RouterLink } from '@angular/router';
+import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { AvatarModule } from 'primeng/avatar';
 import { BadgeModule } from 'primeng/badge';
@@ -39,6 +39,7 @@ import { HasPermissionPipe } from './has-permission.pipe';
     Ripple,
     RouterOutlet,
     RouterLink,
+    RouterLinkActive,
     HasPermissionPipe,
   ],
   selector: 'layout-feature-layout',
