@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { Role } from '@angular-monorepo/auth/domain';
 import { RolesActions } from '../+state/roles.actions';
 import { rolesFeature } from '../+state/roles.reducer';
@@ -23,6 +23,17 @@ export class ManageFacade {
   permissions$: Observable<{ label: string; value: string }[]> =
     this.store.select(rolesFeature.selectPermissions);
 
+  // Selector for checking if a role can be deleted
+  canDeleteRole$: Observable<{ [roleId: number]: boolean } | null> =
+    this.store.select(rolesFeature.selectCanDeleteRole);
+
+  // Method to check if a specific role can be deleted
+  canDeleteRoleById$(roleId: number): Observable<boolean | null> {
+    return this.canDeleteRole$.pipe(
+      map((canDeleteMap) => (canDeleteMap ? canDeleteMap[roleId] : null))
+    );
+  }
+
   // Actions
   loadRoles(): void {
     this.store.dispatch(RolesActions.loadRoles());
@@ -44,11 +55,19 @@ export class ManageFacade {
     this.store.dispatch(RolesActions.updateRole({ role }));
   }
 
-  deleteRole(roleId: number): void {
-    this.store.dispatch(RolesActions.deleteRole({ roleId }));
-  }
-
+  /**
+   * Checks if a role can be deleted before proceeding with deletion.
+   * This should be called before attempting to delete a role.
+   */
   checkRoleDeletable(roleId: number): void {
     this.store.dispatch(RolesActions.checkRoleDeletable({ roleId }));
+  }
+
+  /**
+   * Deletes a role. Make sure to call checkRoleDeletable first to verify
+   * the role is not assigned to any users.
+   */
+  deleteRole(roleId: number): void {
+    this.store.dispatch(RolesActions.deleteRole({ roleId }));
   }
 }

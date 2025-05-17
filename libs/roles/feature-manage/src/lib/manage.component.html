@@ -1,15 +1,17 @@
-<div class="p-4 bg-white">
+<div class="p-4 bg-white dark:bg-gray-900">
   <p-toast></p-toast>
   <p-confirmDialog></p-confirmDialog>
 
-  <p-card styleClass="shadow-md">
+  <p-card styleClass="shadow-md dark:bg-gray-800">
     <ng-template pTemplate="title">
       <div class="flex justify-between items-center">
-        <h2 class="text-xl font-semibold text-gray-800">Role Management</h2>
+        <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">
+          Role Management
+        </h1>
         <p-button
           label="Create New Role"
           icon="pi pi-plus"
-          (onClick)="openCreateDialog()"
+          (onClick)="navigateToCreate()"
           styleClass="p-button-success"
           *hasRole="'Super Admin'"
         ></p-button>
@@ -17,17 +19,13 @@
     </ng-template>
 
     <ng-template pTemplate="content">
-      <!-- Loading spinner -->
+      <!-- Loading state -->
       @if (loading()) {
-      <div class="flex justify-center my-8">
-        <p-progressSpinner></p-progressSpinner>
-      </div>
-      }
-
-      <!-- Error message -->
-      @if (error()) {
-      <div class="bg-red-100 text-red-700 p-3 rounded-md mb-4">
-        {{ error() }}
+      <div class="flex justify-center items-center p-4">
+        <p-progressSpinner
+          strokeWidth="4"
+          styleClass="w-12 h-12"
+        ></p-progressSpinner>
       </div>
       }
 
@@ -36,74 +34,65 @@
       <div class="overflow-x-auto">
         <p-table
           [value]="roles()"
+          styleClass="p-datatable-sm"
+          [tableStyle]="{ 'min-width': '50rem' }"
           [paginator]="true"
           [rows]="10"
+          [rowsPerPageOptions]="[5, 10, 25, 50]"
           [showCurrentPageReport]="true"
           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} roles"
-          [rowsPerPageOptions]="[5, 10, 25, 50]"
-          styleClass="border border-gray-200"
         >
           <ng-template pTemplate="header">
-            <tr class="bg-gray-50">
-              <th class="text-gray-700 border-b border-gray-200 p-3">ID</th>
-              <th class="text-gray-700 border-b border-gray-200 p-3">Name</th>
-              <th class="text-gray-700 border-b border-gray-200 p-3">
+            <tr class="bg-gray-50 dark:bg-gray-700">
+              <th class="text-left text-gray-700 dark:text-gray-200">Name</th>
+              <th class="text-left text-gray-700 dark:text-gray-200">
+                Description
+              </th>
+              <th class="text-left text-gray-700 dark:text-gray-200">
                 Permissions
               </th>
-              <th class="text-gray-700 border-b border-gray-200 p-3">
+              <th
+                class="text-center text-gray-700 dark:text-gray-200 w-[150px]"
+              >
                 Actions
               </th>
             </tr>
           </ng-template>
-
           <ng-template pTemplate="body" let-role>
-            <tr class="border-b border-gray-200 hover:bg-gray-50">
-              <td class="text-gray-800 p-3">
-                {{ role.id }}
-              </td>
-              <td class="text-gray-800 p-3">
-                {{ role.name }}
-              </td>
-              <td class="p-3">
-                <div class="flex flex-wrap gap-2">
+            <tr
+              class="dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700"
+            >
+              <td>{{ role.name }}</td>
+              <td>{{ role.description }}</td>
+              <td>
+                <div class="flex flex-wrap gap-1">
                   @for (permission of role.permissions; track permission) {
                   <span
-                    class="px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-800"
+                    class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                    pTooltip="{{ permission }}"
                   >
                     {{ permission }}
                   </span>
-                  } @empty {
-                  <span class="text-gray-500">No permissions</span>
                   }
                 </div>
               </td>
-              <td class="p-3">
-                <div class="flex gap-2">
+              <td>
+                <div class="flex justify-center gap-2">
                   <p-button
                     icon="pi pi-pencil"
-                    styleClass="p-button-rounded p-button-text p-button-warning"
-                    pTooltip="Edit Role"
-                    tooltipPosition="top"
-                    (onClick)="openEditDialog(role)"
+                    class="p-button-rounded p-button-text p-button-sm"
+                    (onClick)="navigateToEdit(role)"
                     *hasRole="'Super Admin'"
+                    pTooltip="Edit Role"
                   ></p-button>
                   <p-button
                     icon="pi pi-trash"
-                    styleClass="p-button-rounded p-button-text p-button-danger"
-                    pTooltip="Delete Role"
-                    tooltipPosition="top"
+                    class="p-button-rounded p-button-text p-button-danger p-button-sm"
                     (onClick)="confirmDelete(role)"
                     *hasRole="'Super Admin'"
+                    pTooltip="Delete Role"
                   ></p-button>
                 </div>
-              </td>
-            </tr>
-          </ng-template>
-
-          <ng-template pTemplate="emptymessage">
-            <tr>
-              <td colspan="4" class="text-center py-6 text-gray-500">
-                No roles found. Create a new role to get started.
               </td>
             </tr>
           </ng-template>
@@ -114,19 +103,21 @@
       <!-- Empty state -->
       @if (!hasRoles() && !loading()) {
       <div
-        class="flex flex-col items-center justify-center py-10 text-center bg-gray-50 rounded-lg"
+        class="flex flex-col items-center justify-center py-10 text-center bg-gray-50 dark:bg-gray-800 rounded-lg"
       >
-        <i class="pi pi-users text-5xl mb-4 text-gray-400"></i>
-        <h3 class="text-xl font-semibold mb-2 text-gray-800">
+        <i
+          class="pi pi-users text-5xl mb-4 text-gray-400 dark:text-gray-500"
+        ></i>
+        <h3 class="text-xl font-semibold mb-2 text-gray-800 dark:text-gray-200">
           No Roles Available
         </h3>
-        <p class="text-gray-600 mb-2">
+        <p class="text-gray-600 dark:text-gray-400 mb-2">
           Create your first role to get started with user management.
         </p>
         <p-button
           label="Create New Role"
           icon="pi pi-plus"
-          (onClick)="openCreateDialog()"
+          (onClick)="navigateToCreate()"
           styleClass="p-button-success mt-3"
           *hasRole="'Super Admin'"
         ></p-button>
@@ -134,24 +125,4 @@
       }
     </ng-template>
   </p-card>
-
-  <!-- Role Dialog (Create/Edit) -->
-  <p-dialog
-    [visible]="displayDialog()"
-    (visibleChange)="displayDialog.set($event)"
-    [style]="{ width: '500px' }"
-    [header]="dialogMode() === 'create' ? 'Create New Role' : 'Edit Role'"
-    [modal]="true"
-    [draggable]="false"
-    [resizable]="false"
-  >
-    <roles-ui-manage-form
-      [mode]="dialogMode()"
-      [role]="selectedRole()"
-      [availablePermissions]="permissions()"
-      (save)="saveRole($event)"
-      (cancelSave)="closeDialog()"
-    >
-    </roles-ui-manage-form>
-  </p-dialog>
 </div>

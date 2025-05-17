@@ -81,25 +81,70 @@ export class RolesEffects {
     this.actions$.pipe(
       ofType(RolesActions.deleteRole),
       mergeMap(({ roleId }) =>
-        this.rolesService.deleteRole(roleId).pipe(
-          map(() => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Success',
-              detail: 'Role deleted successfully',
-            });
-            return RolesActions.deleteRoleSuccess({ roleId });
+        // First check if the role can be deleted (not assigned to any users)
+        this.rolesService.canDeleteRole(roleId).pipe(
+          mergeMap((canDelete) => {
+            if (!canDelete) {
+              // Role cannot be deleted, dispatch message action and failure action
+              return [
+                RolesActions.showMessage({
+                  severity: 'error',
+                  summary: 'Cannot Delete',
+                  detail:
+                    'This role cannot be deleted because it is assigned to one or more users.',
+                  life: 5000,
+                }),
+                RolesActions.deleteRoleFailure({
+                  error: 'Role is assigned to users and cannot be deleted',
+                }),
+              ];
+            }
+
+            // Role can be deleted, proceed with deletion
+            return this.rolesService.deleteRole(roleId).pipe(
+              map(() => {
+                return RolesActions.deleteRoleSuccess({ roleId });
+              }),
+              catchError((error) => {
+                return of(
+                  RolesActions.deleteRoleFailure({ error: error.message })
+                );
+              })
+            );
           }),
           catchError((error) => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'Failed to delete role',
-            });
             return of(RolesActions.deleteRoleFailure({ error: error.message }));
           })
         )
       )
+    )
+  );
+
+  showSuccessMessage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(
+        RolesActions.createRoleSuccess,
+        RolesActions.updateRoleSuccess,
+        RolesActions.deleteRoleSuccess
+      ),
+      map((action) => {
+        let detail = 'Operation completed successfully';
+
+        if ('role' in action) {
+          detail = `Role "${action.role.name}" was successfully ${
+            action.type.includes('create') ? 'created' : 'updated'
+          }`;
+        } else if (action.type.includes('delete')) {
+          detail = 'Role was successfully deleted';
+        }
+
+        return RolesActions.showMessage({
+          severity: 'success',
+          summary: 'Success',
+          detail,
+          life: 3000,
+        });
+      })
     )
   );
 

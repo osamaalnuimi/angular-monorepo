@@ -9,6 +9,11 @@ export const RolesActions = createActionGroup({
     'Load Roles Success': props<{ roles: Role[] }>(),
     'Load Roles Failure': props<{ error: string }>(),
 
+    // Load role by id
+    'Load Role By Id': props<{ id: number }>(),
+    'Load Role By Id Success': props<{ role: Role }>(),
+    'Load Role By Id Failure': props<{ error: string }>(),
+
     // Create role
     'Create Role': props<{ role: Omit<Role, 'id'> }>(),
     'Create Role Success': props<{ role: Role }>(),
@@ -41,5 +46,13 @@ export const RolesActions = createActionGroup({
       permissions: { label: string; value: string }[];
     }>(),
     'Load Permissions Failure': props<{ error: string }>(),
+
+    // Show message
+    'Show Message': props<{
+      severity: 'success' | 'info' | 'warn' | 'error';
+      summary: string;
+      detail: string;
+      life?: number;
+    }>(),
   },
 });

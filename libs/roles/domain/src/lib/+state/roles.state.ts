@@ -6,6 +6,7 @@ export interface RolesState {
   loading: boolean;
   error: string | null;
   permissions: { label: string; value: string }[];
+  canDeleteRole: { [roleId: number]: boolean } | null;
 }
 
 export const initialRolesState: RolesState = {
@@ -14,4 +15,5 @@ export const initialRolesState: RolesState = {
   loading: false,
   error: null,
   permissions: [],
+  canDeleteRole: null,
 };

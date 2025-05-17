@@ -1,0 +1,36 @@
+{
+  "name": "roles-feature-create-role",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/roles/feature-create-role/src",
+  "prefix": "roles-feature-create-role",
+  "projectType": "library",
+  "tags": ["domain:roles", "type:feature"],
+  "targets": {
+    "build": {
+      "executor": "@nx/angular:ng-packagr-lite",
+      "outputs": ["{workspaceRoot}/dist/{projectRoot}"],
+      "options": {
+        "project": "libs/roles/feature-create-role/ng-package.json"
+      },
+      "configurations": {
+        "production": {
+          "tsConfig": "libs/roles/feature-create-role/tsconfig.lib.prod.json"
+        },
+        "development": {
+          "tsConfig": "libs/roles/feature-create-role/tsconfig.lib.json"
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "libs/roles/feature-create-role/jest.config.ts"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}

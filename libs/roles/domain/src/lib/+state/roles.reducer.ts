@@ -1,6 +1,6 @@
 import { createFeature, createReducer, on } from '@ngrx/store';
 import { RolesActions } from './roles.actions';
-import { RolesState, initialRolesState } from './roles.state';
+import { initialRolesState } from './roles.state';
 
 const reducer = createReducer(
   initialRolesState,
@@ -77,6 +77,14 @@ const reducer = createReducer(
     roles: state.roles.filter((role) => role.id !== roleId),
     loading: false,
     error: null,
+    // Clear the canDeleteRole status for this role
+    canDeleteRole: state.canDeleteRole
+      ? Object.fromEntries(
+          Object.entries(state.canDeleteRole).filter(
+            ([key]) => Number(key) !== roleId
+          )
+        )
+      : null,
   })),
 
   on(RolesActions.deleteRoleFailure, (state, { error }) => ({
@@ -89,6 +97,32 @@ const reducer = createReducer(
   on(RolesActions.selectRole, (state, { role }) => ({
     ...state,
     selectedRole: role,
+  })),
+
+  // Check if role can be deleted
+  on(RolesActions.checkRoleDeletable, (state) => ({
+    ...state,
+    loading: true,
+    error: null,
+  })),
+
+  on(
+    RolesActions.checkRoleDeletableSuccess,
+    (state, { roleId, canDelete }) => ({
+      ...state,
+      loading: false,
+      error: null,
+      canDeleteRole: {
+        ...(state.canDeleteRole || {}),
+        [roleId]: canDelete,
+      },
+    })
+  ),
+
+  on(RolesActions.checkRoleDeletableFailure, (state, { error }) => ({
+    ...state,
+    loading: false,
+    error,
   })),
 
   // Load permissions

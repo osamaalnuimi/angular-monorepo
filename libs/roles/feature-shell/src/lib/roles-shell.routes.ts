@@ -20,6 +20,20 @@ export const rolesShellRoutes: Routes = [
             (m) => m.rolesManageRoutes
           ),
       },
+      {
+        path: 'create',
+        loadChildren: () =>
+          import('@angular-monorepo/roles/feature-create-role').then(
+            (m) => m.createRoleRoute
+          ),
+      },
+      {
+        path: 'update/:id',
+        loadChildren: () =>
+          import('@angular-monorepo/roles/feature-update-role').then(
+            (m) => m.updateRoleRoute
+          ),
+      },
     ],
   },
 ];
