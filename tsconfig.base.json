@@ -37,16 +37,24 @@
       "@angular-monorepo/roles/ui-manage-form": [
         "libs/roles/ui-manage-form/src/index.ts"
       ],
+     
       "@angular-monorepo/users/domain": ["libs/users/domain/src/index.ts"],
+      "@angular-monorepo/users/feature-create-user": [
+        "libs/users/feature-create-user/src/index.ts"
+      ],
       "@angular-monorepo/users/feature-manage": [
         "libs/users/feature-manage/src/index.ts"
       ],
       "@angular-monorepo/users/feature-shell": [
         "libs/users/feature-shell/src/index.ts"
       ],
+      "@angular-monorepo/users/feature-update-user": [
+        "libs/users/feature-update-user/src/index.ts"
+      ],
       "@angular-monorepo/users/ui-user-form": [
         "libs/users/ui-user-form/src/index.ts"
       ],
+     
       "@angular-monorepo/visualizations/domain": [
         "libs/visualizations/domain/src/index.ts"
       ],

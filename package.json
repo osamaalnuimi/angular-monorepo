@@ -5,7 +5,7 @@
   "scripts": {
     "build": "nx build angular-case-study",
     "serve": "nx serve angular-case-study",
-    "users-management": "nx serve users-management",
+    "users-management": "nx serve users-management --no-hmr",
     "users-management:build": "nx build users-management",
     "mock-api": "json-server --watch tools/mock-api/db.json --port 3000 --middlewares tools/mock-api/auth-middleware.js"
   },

@@ -1,20 +1,18 @@
-import { CommonModule, NgClass } from '@angular/common';
+import { NgClass } from '@angular/common';
 import {
-  Component,
   ChangeDetectionStrategy,
+  Component,
   OnInit,
   effect,
   inject,
+  input,
   model,
   output,
   signal,
-  input,
 } from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
-  FormGroup,
-  FormsModule,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
@@ -30,7 +28,7 @@ import { PasswordModule } from 'primeng/password';
 
 // Application Imports
 import { Role, User } from '@angular-monorepo/auth/domain';
-import { SelectChangeEvent, SelectModule } from 'primeng/select';
+import { SelectModule } from 'primeng/select';
 import { usernameExistsValidator } from './validators/username-validator';
 
 @Component({

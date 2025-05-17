@@ -1,7 +1,10 @@
 <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="p-fluid">
   <!-- Username field -->
-  <div class="field mb-4">
-    <label for="username" class="block text-sm font-medium text-gray-700 mb-1">
+  <div class="mb-4 flex flex-col gap-2">
+    <label
+      for="username"
+      class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+    >
       Username *
     </label>
     <div class="p-inputgroup">
@@ -26,7 +29,7 @@
     </div>
     @if (userForm.get('username')?.invalid && (userForm.get('username')?.touched
     || userForm.get('username')?.dirty)) {
-    <small class="p-error block mt-1">
+    <small class="text-red-500 dark:text-red-400 block mt-1">
       @if (userForm.get('username')?.errors?.['required']) { Username is
       required } @else if (userForm.get('username')?.errors?.['minlength']) {
       Username must be at least 3 characters } @else if
@@ -37,8 +40,11 @@
   </div>
 
   <!-- Password field -->
-  <div class="field mb-4">
-    <label for="password" class="block text-sm font-medium text-gray-700 mb-1">
+  <div class="mb-4 flex flex-col gap-2">
+    <label
+      for="password"
+      class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+    >
       Password {{ isEditMode() ? '(leave blank to keep current)' : '*' }}
     </label>
     <p-password
@@ -59,7 +65,7 @@
     ></p-password>
     @if (userForm.get('password')?.invalid && (userForm.get('password')?.touched
     || userForm.get('password')?.dirty)) {
-    <small class="text-red-500 block mt-1">
+    <small class="text-red-500 dark:text-red-400 block mt-1">
       @if (userForm.get('password')?.errors?.['required']) { Password is
       required } @else if (userForm.get('password')?.errors?.['minlength']) {
       Password must be at least 6 characters }
@@ -68,8 +74,11 @@
   </div>
 
   <!-- Full Name field -->
-  <div class="field mb-4">
-    <label for="fullName" class="block text-sm font-medium text-gray-700 mb-1">
+  <div class="mb-4 flex flex-col gap-2">
+    <label
+      for="fullName"
+      class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+    >
       Full Name *
     </label>
     <input
@@ -86,13 +95,18 @@
     />
     @if (userForm.get('fullName')?.invalid && (userForm.get('fullName')?.touched
     || userForm.get('fullName')?.dirty)) {
-    <small class="text-red-500 block mt-1"> Full name is required </small>
+    <small class="text-red-500 dark:text-red-400 block mt-1">
+      Full name is required
+    </small>
     }
   </div>
 
   <!-- Email field -->
-  <div class="field mb-4">
-    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
+  <div class="mb-4 flex flex-col gap-2">
+    <label
+      for="email"
+      class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+    >
       Email
     </label>
     <input
@@ -109,16 +123,19 @@
     />
     @if (userForm.get('email')?.invalid && (userForm.get('email')?.touched ||
     userForm.get('email')?.dirty)) {
-    <small class="text-red-500 block mt-1">
+    <small class="text-red-500 dark:text-red-400 block mt-1">
       Please enter a valid email address
     </small>
     }
   </div>
 
   <!-- Role selection -->
-  <div class="field mb-4">
-    <label for="role" class="block text-sm font-medium text-gray-700 mb-1">
-      Role <span class="text-red-500">*</span>
+  <div class="mb-4 flex flex-col gap-2">
+    <label
+      for="role"
+      class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+    >
+      Role <span class="text-red-500 dark:text-red-400">*</span>
     </label>
     <p-select
       id="role"
@@ -138,21 +155,25 @@
     </p-select>
     @if (userForm.get('roleId')?.invalid && (userForm.get('roleId')?.touched ||
     userForm.get('roleId')?.dirty)) {
-    <small class="text-red-500 block mt-1"> Role is required </small>
+    <small class="text-red-500 dark:text-red-400 block mt-1">
+      Role is required
+    </small>
     }
   </div>
 
   <!-- Active status -->
-  <div class="field-checkbox mb-4">
+  <div class="flex items-center mb-4">
     <p-checkbox
       id="isActive"
       formControlName="isActive"
       [binary]="true"
       inputId="isActive"
     ></p-checkbox>
-    <label for="isActive" class="ml-2 text-sm font-medium text-gray-700">
-      Active User
-    </label>
+    <label
+      for="isActive"
+      class="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300"
+      >Active Account</label
+    >
   </div>
 
   <p-divider></p-divider>
@@ -168,10 +189,10 @@
     ></p-button>
     <p-button
       type="submit"
-      label="Save"
-      icon="pi pi-check"
-      [loading]="false"
-      [disabled]="userForm.invalid || userForm.pending"
+      [label]="isEditMode() ? 'Update User' : 'Create User'"
+      icon="pi pi-save"
+      [loading]="userForm.get('username')?.pending || false"
+      [disabled]="userForm.invalid || userForm.get('username')?.pending"
     ></p-button>
   </div>
 </form>

@@ -1,0 +1,36 @@
+{
+  "name": "users-feature-update-user",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/users/feature-update-user/src",
+  "prefix": "users-feature-update-user",
+  "projectType": "library",
+  "tags": ["domain:users", "type:feature"],
+  "targets": {
+    "build": {
+      "executor": "@nx/angular:ng-packagr-lite",
+      "outputs": ["{workspaceRoot}/dist/{projectRoot}"],
+      "options": {
+        "project": "libs/users/feature-update-user/ng-package.json"
+      },
+      "configurations": {
+        "production": {
+          "tsConfig": "libs/users/feature-update-user/tsconfig.lib.prod.json"
+        },
+        "development": {
+          "tsConfig": "libs/users/feature-update-user/tsconfig.lib.json"
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "libs/users/feature-update-user/jest.config.ts"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}

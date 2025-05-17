@@ -1,21 +1,20 @@
 import { LoginFacade } from '@angular-monorepo/auth/domain';
-import { Component, inject, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { InputTextModule } from 'primeng/inputtext';
+import { MessageModule } from 'primeng/message';
 import { PasswordModule } from 'primeng/password';
 import { RippleModule } from 'primeng/ripple';
-import { MessageModule } from 'primeng/message';
 import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
-import { CommonModule } from '@angular/common';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   imports: [
-    CommonModule,
     ButtonModule,
     CheckboxModule,
     InputTextModule,
@@ -25,6 +24,7 @@ import { Subject, takeUntil } from 'rxjs';
     RippleModule,
     MessageModule,
     ToastModule,
+    ProgressSpinnerModule,
   ],
   providers: [MessageService],
   selector: 'auth-feature-login',

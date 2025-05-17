@@ -1,0 +1,54 @@
+<div class="p-4">
+  <p-toast></p-toast>
+
+  <p-card styleClass="shadow-md max-w-3xl mx-auto">
+    <ng-template pTemplate="title">
+      <div class="flex justify-between items-center">
+        <div class="flex items-center gap-2">
+          <p-button
+            icon="pi pi-arrow-left"
+            styleClass="p-button-rounded p-button-text"
+            (onClick)="navigateToUsersList()"
+            pTooltip="Back to Users"
+            tooltipPosition="right"
+          ></p-button>
+          <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">
+            Create New User
+          </h2>
+        </div>
+      </div>
+    </ng-template>
+
+    <ng-template pTemplate="content">
+      <!-- Loading spinner -->
+      @if (loading()) {
+      <div class="flex justify-center my-8">
+        <p-progressSpinner></p-progressSpinner>
+      </div>
+      }
+
+      <!-- Error message -->
+      @if (error()) {
+      <div
+        class="bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-100 p-3 rounded-md mb-4"
+      >
+        {{ error() }}
+      </div>
+      }
+
+      <!-- User form -->
+      @if (!loading()) {
+      <div class="max-w-2xl mx-auto">
+        <users-ui-user-form
+          mode="create"
+          [availableRoles]="roles()"
+          [validateUsername]="validateUsername"
+          (save)="saveUser($event)"
+          (cancelSave)="cancelCreate()"
+        >
+        </users-ui-user-form>
+      </div>
+      }
+    </ng-template>
+  </p-card>
+</div>

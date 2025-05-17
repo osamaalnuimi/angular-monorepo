@@ -1,15 +1,17 @@
-<div class="p-4 bg-white">
+<div class="p-4">
   <p-toast></p-toast>
   <p-confirmDialog></p-confirmDialog>
 
   <p-card styleClass="shadow-md">
     <ng-template pTemplate="title">
       <div class="flex justify-between items-center">
-        <h2 class="text-xl font-semibold text-gray-800">User Management</h2>
+        <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">
+          User Management
+        </h2>
         <p-button
           label="Create New User"
           icon="pi pi-plus"
-          (onClick)="openCreateDialog()"
+          (onClick)="navigateToCreateUser()"
           styleClass="p-button-success"
           *hasPermission="'create:users'"
         ></p-button>
@@ -26,7 +28,9 @@
 
       <!-- Error message -->
       @if (error()) {
-      <div class="bg-red-100 text-red-700 p-3 rounded-md mb-4">
+      <div
+        class="bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-100 p-3 rounded-md mb-4"
+      >
         {{ error() }}
       </div>
       }
@@ -41,38 +45,54 @@
           [showCurrentPageReport]="true"
           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} users"
           [rowsPerPageOptions]="[5, 10, 25, 50]"
-          styleClass="border border-gray-200"
+          styleClass="border border-gray-200 dark:border-gray-700"
         >
           <ng-template pTemplate="header">
-            <tr class="bg-gray-50">
-              <th class="text-gray-700 border-b border-gray-200 p-3">ID</th>
-              <th class="text-gray-700 border-b border-gray-200 p-3">
+            <tr class="bg-gray-50 dark:bg-gray-800">
+              <th
+                class="text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 p-3"
+              >
+                ID
+              </th>
+              <th
+                class="text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 p-3"
+              >
                 Username
               </th>
-              <th class="text-gray-700 border-b border-gray-200 p-3">
+              <th
+                class="text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 p-3"
+              >
                 Full Name
               </th>
-              <th class="text-gray-700 border-b border-gray-200 p-3">Role</th>
-              <th class="text-gray-700 border-b border-gray-200 p-3">
+              <th
+                class="text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 p-3"
+              >
+                Role
+              </th>
+              <th
+                class="text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 p-3"
+              >
                 Actions
               </th>
             </tr>
           </ng-template>
 
           <ng-template pTemplate="body" let-user>
-            <tr class="border-b border-gray-200 hover:bg-gray-50">
-              <td class="text-gray-800 p-3">
+            <tr
+              class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
+            >
+              <td class="text-gray-800 dark:text-gray-200 p-3">
                 {{ user.id }}
               </td>
-              <td class="text-gray-800 p-3">
+              <td class="text-gray-800 dark:text-gray-200 p-3">
                 {{ user.username }}
               </td>
-              <td class="text-gray-800 p-3">
+              <td class="text-gray-800 dark:text-gray-200 p-3">
                 {{ user.fullName }}
               </td>
-              <td class="text-gray-800 p-3">
+              <td class="text-gray-800 dark:text-gray-200 p-3">
                 <span
-                  class="px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-800"
+                  class="px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100"
                 >
                   {{ user.role?.name || 'No Role' }}
                 </span>
@@ -92,7 +112,7 @@
                     styleClass="p-button-rounded p-button-text p-button-warning"
                     pTooltip="Edit User"
                     tooltipPosition="top"
-                    (onClick)="openEditDialog(user)"
+                    (onClick)="navigateToEditUser(user)"
                     *hasPermission="'edit:users'"
                   ></p-button>
                   <p-button
@@ -110,7 +130,10 @@
 
           <ng-template pTemplate="emptymessage">
             <tr>
-              <td colspan="5" class="text-center py-6 text-gray-500">
+              <td
+                colspan="5"
+                class="text-center py-6 text-gray-500 dark:text-gray-400"
+              >
                 No users found. Create a new user to get started.
               </td>
             </tr>
@@ -122,19 +145,21 @@
       <!-- Empty state -->
       @if (!hasUsers() && !loading()) {
       <div
-        class="flex flex-col items-center justify-center py-10 text-center bg-gray-50 rounded-lg"
+        class="flex flex-col items-center justify-center py-10 text-center bg-gray-50 dark:bg-gray-800 rounded-lg"
       >
-        <i class="pi pi-users text-5xl mb-4 text-gray-400"></i>
-        <h3 class="text-xl font-semibold mb-2 text-gray-800">
+        <i
+          class="pi pi-users text-5xl mb-4 text-gray-400 dark:text-gray-500"
+        ></i>
+        <h3 class="text-xl font-semibold mb-2 text-gray-800 dark:text-gray-100">
           No Users Available
         </h3>
-        <p class="text-gray-600 mb-2">
+        <p class="text-gray-600 dark:text-gray-400 mb-2">
           Create your first user to get started with user management.
         </p>
         <p-button
           label="Create New User"
           icon="pi pi-plus"
-          (onClick)="openCreateDialog()"
+          (onClick)="navigateToCreateUser()"
           styleClass="p-button-success mt-3"
           *hasPermission="'create:users'"
         ></p-button>
@@ -142,29 +167,6 @@
       }
     </ng-template>
   </p-card>
-
-  <!-- User Dialog (Create/Edit) -->
-  <p-dialog
-    [visible]="displayDialog()"
-    (visibleChange)="displayDialog.set($event)"
-    [style]="{ width: '500px' }"
-    [header]="dialogMode() === 'create' ? 'Create New User' : 'Edit User'"
-    [modal]="true"
-    [draggable]="false"
-    [resizable]="false"
-  >
-    @if (displayDialog()) {
-    <users-ui-user-form
-      [mode]="dialogMode()"
-      [user]="selectedUser()"
-      [availableRoles]="roles()"
-      [validateUsername]="validateUsername"
-      (save)="saveUser($event)"
-      (cancelSave)="closeDialog()"
-    >
-    </users-ui-user-form>
-    }
-  </p-dialog>
 
   <!-- User Detail View -->
   <p-dialog
@@ -179,29 +181,37 @@
     @if (detailUser()) {
     <div class="p-4">
       <div class="mb-4">
-        <h3 class="text-lg font-semibold mb-2">Basic Information</h3>
+        <h3 class="text-lg font-semibold mb-2 text-gray-800 dark:text-gray-100">
+          Basic Information
+        </h3>
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <p class="text-gray-500 mb-1">Username</p>
-            <p class="font-medium">{{ detailUser()?.username }}</p>
+            <p class="text-gray-500 dark:text-gray-400 mb-1">Username</p>
+            <p class="font-medium text-gray-800 dark:text-gray-200">
+              {{ detailUser()?.username }}
+            </p>
           </div>
           <div>
-            <p class="text-gray-500 mb-1">Full Name</p>
-            <p class="font-medium">{{ detailUser()?.fullName }}</p>
+            <p class="text-gray-500 dark:text-gray-400 mb-1">Full Name</p>
+            <p class="font-medium text-gray-800 dark:text-gray-200">
+              {{ detailUser()?.fullName }}
+            </p>
           </div>
           <div>
-            <p class="text-gray-500 mb-1">Email</p>
-            <p class="font-medium">
+            <p class="text-gray-500 dark:text-gray-400 mb-1">Email</p>
+            <p class="font-medium text-gray-800 dark:text-gray-200">
               {{ detailUser()?.email || 'Not provided' }}
             </p>
           </div>
           <div>
-            <p class="text-gray-500 mb-1">Status</p>
+            <p class="text-gray-500 dark:text-gray-400 mb-1">Status</p>
             <p class="font-medium">
               <span
                 [ngClass]="{
-                  'bg-green-100 text-green-800': detailUser()?.isActive,
-                  'bg-red-100 text-red-800': !detailUser()?.isActive
+                  'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100':
+                    detailUser()?.isActive,
+                  'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100':
+                    !detailUser()?.isActive
                 }"
                 class="px-3 py-1 rounded-full text-sm"
               >
@@ -213,12 +223,14 @@
       </div>
 
       <div class="mb-4">
-        <h3 class="text-lg font-semibold mb-2">Role & Permissions</h3>
+        <h3 class="text-lg font-semibold mb-2 text-gray-800 dark:text-gray-100">
+          Role & Permissions
+        </h3>
         <div class="mb-3">
-          <p class="text-gray-500 mb-1">Assigned Role</p>
+          <p class="text-gray-500 dark:text-gray-400 mb-1">Assigned Role</p>
           <p class="font-medium">
             <span
-              class="px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-800"
+              class="px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100"
             >
               {{ detailUser()?.role?.name || 'No Role' }}
             </span>
@@ -226,20 +238,22 @@
         </div>
 
         <div>
-          <p class="text-gray-500 mb-2">Permissions</p>
+          <p class="text-gray-500 dark:text-gray-400 mb-2">Permissions</p>
           @if (detailUser()?.role?.permissions?.length) {
           <div class="flex flex-wrap gap-2">
             @for (permission of detailUser()?.role?.permissions; track
             permission) {
             <span
-              class="px-3 py-1 text-sm rounded-full bg-purple-100 text-purple-800"
+              class="px-3 py-1 text-sm rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-100"
             >
               {{ permission }}
             </span>
             }
           </div>
           } @else {
-          <p class="text-gray-500">No permissions assigned</p>
+          <p class="text-gray-500 dark:text-gray-400">
+            No permissions assigned
+          </p>
           }
         </div>
       </div>

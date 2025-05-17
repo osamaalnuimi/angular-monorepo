@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import {
   Component,
   OnInit,
@@ -6,11 +5,10 @@ import {
   effect,
   inject,
   signal,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
-import { Observable, map } from 'rxjs';
+import { Router } from '@angular/router';
 
 // PrimeNG Components
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -18,74 +16,51 @@ import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogModule } from 'primeng/dialog';
-import { InputTextModule } from 'primeng/inputtext';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TableModule } from 'primeng/table';
 import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 
 // Application Imports
-import {
-  HasPermissionDirective,
-  Role,
-  User,
-} from '@angular-monorepo/auth/domain';
-import { ManageFacade, UsersService } from '@angular-monorepo/users/domain';
-import { UserFormComponent } from '@angular-monorepo/users/ui-user-form';
+import { HasPermissionDirective, User } from '@angular-monorepo/auth/domain';
+import { ManageFacade } from '@angular-monorepo/users/domain';
+import { NgClass } from '@angular/common';
 
 @Component({
   selector: 'users-feature-manage',
-  standalone: true,
   imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    RouterModule,
-    TableModule,
+    NgClass,
     ButtonModule,
-    DialogModule,
-    InputTextModule,
-    ToastModule,
-    ConfirmDialogModule,
     CardModule,
+    ConfirmDialogModule,
     ProgressSpinnerModule,
+    TableModule,
+    ToastModule,
     TooltipModule,
     HasPermissionDirective,
-    UserFormComponent,
+    DialogModule,
   ],
-  providers: [MessageService, ConfirmationService],
+  providers: [MessageService, ConfirmationService, ManageFacade],
   templateUrl: './manage.component.html',
   styleUrls: ['./manage.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ManageComponent implements OnInit {
   private facade = inject(ManageFacade);
   private confirmationService = inject(ConfirmationService);
-  private usersService = inject(UsersService);
+  private router = inject(Router);
 
   // Convert observables to signals
   users = toSignal(this.facade.users$, { initialValue: [] as User[] });
   loading = toSignal(this.facade.loading$, { initialValue: false });
   error = toSignal(this.facade.error$, { initialValue: null as string | null });
-  selectedUser = toSignal(this.facade.selectedUser$, {
-    initialValue: null as User | null,
-  });
-  roles = toSignal(this.facade.roles$, { initialValue: [] as Role[] });
 
   // UI state signals
-  displayDialog = signal(false);
-  dialogMode = signal<'create' | 'edit'>('create');
   showDetailView = signal(false);
   detailUser = signal<User | null>(null);
 
   // Computed values
   hasUsers = computed(() => this.users()?.length > 0);
-
-  // Username validation function for the form
-  validateUsername = (username: string): Observable<boolean> => {
-    const currentUser = this.selectedUser();
-    const currentUserId = currentUser ? currentUser.id : undefined;
-    return this.usersService.checkUsernameExists(username, currentUserId);
-  };
 
   constructor() {
     // Effect to track changes and perform side effects
@@ -97,32 +72,14 @@ export class ManageComponent implements OnInit {
 
   ngOnInit(): void {
     this.facade.loadUsers();
-    this.facade.loadRoles();
   }
 
-  openCreateDialog(): void {
-    this.dialogMode.set('create');
-    this.facade.selectUser(null);
-    this.displayDialog.set(true);
+  navigateToCreateUser(): void {
+    this.router.navigate(['/users/create']);
   }
 
-  openEditDialog(user: User): void {
-    this.dialogMode.set('edit');
-    this.facade.selectUser(user);
-    this.displayDialog.set(true);
-  }
-
-  closeDialog(): void {
-    this.displayDialog.set(false);
-  }
-
-  saveUser(user: User | Omit<User, 'id'>): void {
-    if (this.dialogMode() === 'create') {
-      this.facade.createUser(user as Omit<User, 'id'>);
-    } else {
-      this.facade.updateUser(user as User);
-    }
-    this.displayDialog.set(false);
+  navigateToEditUser(user: User): void {
+    this.router.navigate(['/users/update', user.id]);
   }
 
   confirmDelete(user: User): void {
